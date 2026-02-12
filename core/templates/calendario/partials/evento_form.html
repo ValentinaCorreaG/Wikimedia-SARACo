@@ -1,0 +1,143 @@
+<!-- templates/calendario/partials/evento_form.html -->
+
+<!-- Modal Background -->
+<div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        
+        <!-- Header del modal -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-2xl flex justify-between items-center sticky top-0 z-10">
+            <h2 class="text-2xl font-bold">{{ titulo }}</h2>
+            <button onclick="document.getElementById('modal-container').classList.add('hidden'); document.getElementById('modal-container').innerHTML = '';"
+                    class="text-white hover:text-blue-200 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Formulario -->
+        <form {% if evento %}hx-post="{% url 'editar_evento' evento.pk %}"{% else %}hx-post="{% url 'crear_evento' %}"{% endif %}
+              hx-swap="none"
+              class="p-6">
+            
+            {% csrf_token %}
+
+            <!-- Mensajes de error del formulario -->
+            {% if form.non_field_errors %}
+            <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-900 rounded-r-lg">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="space-y-5">
+                
+                <!-- Nombre -->
+                <div>
+                    <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                        Nombre del Evento <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                            Fecha de Inicio <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.fecha_inicio }}
+                        {% if form.fecha_inicio.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_inicio.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.fecha_fin.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                            Fecha de Fin <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.fecha_fin }}
+                        {% if form.fecha_fin.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_fin.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Área y Participantes -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.area_responsable.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                            Área Responsable <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.area_responsable }}
+                        {% if form.area_responsable.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.area_responsable.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.participantes_esperados.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                            Participantes Esperados <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.participantes_esperados }}
+                        {% if form.participantes_esperados.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.participantes_esperados.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div>
+                    <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-semibold text-blue-900 mb-2">
+                        Descripción (Opcional)
+                    </label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.descripcion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="mt-8 flex gap-3 justify-end">
+                <button type="button"
+                        onclick="document.getElementById('modal-container').classList.add('hidden'); document.getElementById('modal-container').innerHTML = '';"
+                        class="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl font-medium">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {% if evento %}Actualizar Evento{% else %}Crear Evento{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Escuchar cuando el formulario se envía exitosamente
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.successful) {
+            // Cerrar el modal
+            document.getElementById('modal-container').classList.add('hidden');
+            document.getElementById('modal-container').innerHTML = '';
+            // Recargar la página para ver los cambios
+            window.location.reload();
+        }
+    });
+</script>
+
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.2s ease-out;
+    }
+</style>
