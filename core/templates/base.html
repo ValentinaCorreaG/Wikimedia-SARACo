@@ -8,7 +8,33 @@
     <!-- Tailwind CSS + DaisyUI via CDN -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <style>
+        /* Forzar tamaño correcto de iconos SVG */
+        svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        /* Iconos en botones */
+        .btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        /* Iconos grandes en botones grandes */
+        .btn-lg svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        /* Iconos en eventos del calendario */
+        .evento-icono svg {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+    </style>
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>

@@ -55,8 +55,7 @@ def calendario_vista(request):
             else:
                 # Buscar eventos para este día
                 fecha_dia = datetime(anio, mes, dia_actual)
-                eventos_dia = [e for e in eventos if 
-                              e.fecha_inicio.date() <= fecha_dia.date() <= e.fecha_fin.date()]
+                eventos_dia = [e for e in eventos if e.fecha_inicio <= fecha_dia.date() <= e.fecha_fin]
                 
                 dias.append({
                     'numero': dia_actual,
