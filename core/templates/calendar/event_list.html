@@ -6,15 +6,15 @@
 <div class="min-h-screen bg-base-200 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Encabezado -->
+        <!-- Page header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-blue-900 mb-2">Lista de Eventos</h1>
             <p class="text-blue-700">Gestiona todos tus eventos en un solo lugar</p>
         </div>
 
-        <!-- Mensajes -->
+        <!-- Flash messages -->
         {% if messages %}
-        <div id="mensajes" class="mb-6 space-y-2">
+        <div id="messages" class="mb-6 space-y-2">
             {% for message in messages %}
             <div class="alert alert-info shadow-lg animate-fade-in">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
@@ -26,16 +26,16 @@
         </div>
         {% endif %}
 
-        <!-- Navegación entre vistas -->
+        <!-- Calendar vs list view navigation -->
         <div class="mb-6 flex gap-3">
-            <a href="{% url 'calendario' %}" 
+            <a href="{% url 'calendar' %}" 
                class="px-6 py-2.5 bg-white text-blue-700 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors shadow-md hover:shadow-lg">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 Vista Calendario
             </a>
-            <a href="{% url 'lista_eventos' %}" 
+            <a href="{% url 'event_list' %}" 
                class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg ring-2 ring-blue-300">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
@@ -44,27 +44,26 @@
             </a>
         </div>
 
-        <!-- Contenedor principal -->
+        <!-- Main content card -->
         <div class="card bg-base-100 shadow-xl p-6 lg:p-8">
             
-            <!-- Barra de búsqueda y crear -->
+            <!-- Search input and create-event button -->
             <div class="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div class="w-full sm:w-96">
                     <input type="text" 
                            name="busqueda" 
                            placeholder="Buscar eventos..."
                            class="w-full px-4 py-2 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent"
-                           hx-get="{% url 'lista_eventos' %}"
+                           hx-get="{% url 'event_list' %}"
                            hx-trigger="keyup changed delay:300ms"
-                           hx-target="#lista-eventos"
+                           hx-target="#event-list"
                            hx-include="[name='busqueda']">
                 </div>
                 
                 <button class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl font-medium whitespace-nowrap"
-                        hx-get="{% url 'crear_evento' %}"
-                        hx-target="#modal-container"
-                        hx-swap="innerHTML"
-                        onclick="document.getElementById('modal-container').classList.remove('hidden')">
+                        hx-get="{% url 'create_event' %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
                     <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -72,33 +71,49 @@
                 </button>
             </div>
 
-            <!-- Lista de eventos -->
-            <div id="lista-eventos">
-                {% include 'calendario/partials/eventos_lista.html' %}
+            <!-- Event list (HTMX swaps this area) -->
+            <div id="event-list">
+                {% include 'calendar/partials/event_list.html' %}
             </div>
         </div>
     </div>
 </div>
 
-<!-- Contenedor del Modal -->
-<div id="modal-container" class="hidden"></div>
+<!-- DaisyUI modal (HTMX loads forms/detail/delete into modal-box-content) -->
+<dialog id="modal-container" class="modal">
+    <div id="modal-box-content" class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+        <!-- HTMX swaps content here -->
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button type="submit" class="cursor-default w-full h-full min-h-screen" aria-label="Cerrar"></button>
+    </form>
+</dialog>
 
 <script>
-    // Auto-ocultar mensajes después de 5 segundos
+    // Auto-hide flash messages after 5 seconds
     setTimeout(function() {
-        const mensajes = document.getElementById('mensajes');
-        if (mensajes) {
-            mensajes.style.opacity = '0';
-            mensajes.style.transition = 'opacity 0.5s';
-            setTimeout(() => mensajes.remove(), 500);
+        const messagesEl = document.getElementById('messages');
+        if (messagesEl) {
+            messagesEl.style.opacity = '0';
+            messagesEl.style.transition = 'opacity 0.5s';
+            setTimeout(() => messagesEl.remove(), 500);
         }
     }, 5000);
 
-    // Escuchar evento para cerrar modal
-    document.body.addEventListener('eventoCerrado', function() {
-        document.getElementById('modal-container').classList.add('hidden');
-        document.getElementById('modal-container').innerHTML = '';
-        location.reload(); // Recargar para mostrar mensajes
+    // Open DaisyUI modal when HTMX swaps content into it
+    document.body.addEventListener('htmx:afterSwap', function(ev) {
+        if (ev.detail?.target?.id === 'modal-box-content') {
+            document.getElementById('modal-container').showModal();
+        }
+    });
+
+    // Close modal, clear content, and reload to show success message
+    document.body.addEventListener('eventClosed', function() {
+        var dialog = document.getElementById('modal-container');
+        var box = document.getElementById('modal-box-content');
+        if (dialog) dialog.close();
+        if (box) box.innerHTML = '';
+        location.reload();
     });
 </script>
 

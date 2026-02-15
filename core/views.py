@@ -1,197 +1,186 @@
+"""
+Core app views.
+
+Handles the calendar view, event list, and CRUD operations for events.
+Supports both full-page and HTMX partial responses.
+"""
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
-from .models import Evento
-from .forms import EventoForm
+from .models import Event
+from .forms import EventForm
+
 
 def home(request):
+    """Render the home page."""
     return render(request, 'home.html')
 
-def calendario_vista(request):
-    """Vista principal del calendario"""
-    # Obtener mes y año actual o de los parámetros
-    hoy = datetime.now()
-    mes = int(request.GET.get('mes', hoy.month))
-    anio = int(request.GET.get('anio', hoy.year))
-    
-    # Calcular fechas del mes
-    primer_dia = datetime(anio, mes, 1)
-    ultimo_dia = datetime(anio, mes, monthrange(anio, mes)[1])
-    
-    # Obtener eventos del mes
-    eventos = Evento.objects.filter(
-        Q(fecha_inicio__year=anio, fecha_inicio__month=mes) |
-        Q(fecha_fin__year=anio, fecha_fin__month=mes) |
-        Q(fecha_inicio__lt=primer_dia, fecha_fin__gt=ultimo_dia)
+
+def calendar_view(request):
+    """
+    Main calendar view. Renders a month grid with events.
+    Month and year come from GET params (mes, anio) or default to current date.
+    """
+    today = datetime.now()
+    month = int(request.GET.get('mes', today.month))
+    year = int(request.GET.get('anio', today.year))
+
+    first_day = datetime(year, month, 1)
+    last_day = datetime(year, month, monthrange(year, month)[1])
+
+    events = Event.objects.filter(
+        Q(start_date__year=year, start_date__month=month) |
+        Q(end_date__year=year, end_date__month=month) |
+        Q(start_date__lt=first_day, end_date__gt=last_day)
     )
-    
-    # Calcular navegación
-    mes_anterior = mes - 1 if mes > 1 else 12
-    anio_anterior = anio if mes > 1 else anio - 1
-    mes_siguiente = mes + 1 if mes < 12 else 1
-    anio_siguiente = anio if mes < 12 else anio + 1
-    
-    # Crear estructura del calendario
-    dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    
-    # Primer día de la semana (0 = lunes, 6 = domingo)
-    primer_dia_semana = primer_dia.weekday()
-    
-    # Crear matriz del calendario
-    semanas = []
-    dia_actual = 1
-    total_dias = monthrange(anio, mes)[1]
-    
-    for semana in range(6):  # Máximo 6 semanas en un mes
-        dias = []
-        for dia_semana in range(7):
-            if semana == 0 and dia_semana < primer_dia_semana:
-                dias.append(None)
-            elif dia_actual > total_dias:
-                dias.append(None)
+
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
+
+    week_days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+    first_weekday = first_day.weekday()
+
+    weeks = []
+    current_day = 1
+    total_days = monthrange(year, month)[1]
+
+    for week in range(6):
+        days = []
+        for weekday in range(7):
+            if week == 0 and weekday < first_weekday:
+                days.append(None)
+            elif current_day > total_days:
+                days.append(None)
             else:
-                # Buscar eventos para este día
-                fecha_dia = datetime(anio, mes, dia_actual)
-                eventos_dia = [e for e in eventos if e.fecha_inicio <= fecha_dia.date() <= e.fecha_fin]
-                
-                dias.append({
-                    'numero': dia_actual,
-                    'eventos': eventos_dia,
-                    'es_hoy': (dia_actual == hoy.day and mes == hoy.month and anio == hoy.year)
+                day_date = datetime(year, month, current_day)
+                day_events = [e for e in events if e.start_date <= day_date.date() <= e.end_date]
+                days.append({
+                    'day_number': current_day,
+                    'events': day_events,
+                    'is_today': (current_day == today.day and month == today.month and year == today.year)
                 })
-                dia_actual += 1
-        
-        # Solo agregar la semana si tiene al menos un día
-        if any(dias):
-            semanas.append(dias)
+                current_day += 1
+        if any(days):
+            weeks.append(days)
         else:
             break
-    
-    contexto = {
-        'mes': mes,
-        'anio': anio,
-        'nombre_mes': primer_dia.strftime('%B'),
-        'semanas': semanas,
-        'dias_semana': dias_semana,
-        'mes_anterior': mes_anterior,
-        'anio_anterior': anio_anterior,
-        'mes_siguiente': mes_siguiente,
-        'anio_siguiente': anio_siguiente,
+
+    context = {
+        'month': month,
+        'year': year,
+        'month_name': first_day.strftime('%B'),
+        'weeks': weeks,
+        'week_days': week_days,
+        'prev_month': prev_month,
+        'prev_year': prev_year,
+        'next_month': next_month,
+        'next_year': next_year,
     }
-    
-    return render(request, 'calendario/calendario.html', contexto)
+    return render(request, 'calendar/calendar.html', context)
 
 
-def lista_eventos(request):
-    """Vista de lista de eventos (para HTMX)"""
-    eventos = Evento.objects.all().order_by('fecha_inicio')
-    
-    # Filtro de búsqueda
-    busqueda = request.GET.get('busqueda', '')
-    if busqueda:
-        eventos = eventos.filter(
-            Q(nombre__icontains=busqueda) |
-            Q(area_responsable__icontains=busqueda) |
-            Q(descripcion__icontains=busqueda)
+def event_list(request):
+    """
+    Event list view. Supports search via GET param 'busqueda'.
+    Returns a partial template when requested via HTMX, full page otherwise.
+    """
+    events = Event.objects.all().order_by('start_date')
+    search = request.GET.get('busqueda', '')
+    if search:
+        events = events.filter(
+            Q(name__icontains=search) |
+            Q(responsible_area__icontains=search) |
+            Q(description__icontains=search)
         )
-    
+
     if request.htmx:
-        return render(request, 'calendario/partials/eventos_lista.html', {'eventos': eventos})
-    
-    return render(request, 'calendario/eventos_lista.html', {'eventos': eventos})
+        return render(request, 'calendar/partials/event_list.html', {'events': events})
+    return render(request, 'calendar/event_list.html', {'events': events})
 
 
-def crear_evento(request):
-    """Crear nuevo evento"""
+def create_event(request):
+    """Create a new event. On success, redirects to event list or returns HTMX trigger."""
     if request.method == 'POST':
-        form = EventoForm(request.POST)
+        form = EventForm(request.POST)
         if form.is_valid():
-            evento = form.save()
-            messages.success(request, f'Evento "{evento.nombre}" creado exitosamente.')
-            
+            event = form.save()
+            messages.success(request, f'Evento "{event.name}" creado exitosamente.')
+
             if request.htmx:
-                # IMPORTANTE: Cambiar el target y agregar trigger
-                response = HttpResponse(status=204)  # ← CAMBIAR ESTA LÍNEA
-                response['HX-Trigger'] = 'eventoCerrado'
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = 'eventClosed'
                 return response
-            
-            return redirect('lista_eventos')
-        
+            return redirect('event_list')
     else:
-        form = EventoForm()
-    
+        form = EventForm()
+
     if request.htmx:
-        return render(request, 'calendario/partials/evento_form.html', {
+        return render(request, 'calendar/partials/event_form.html', {
             'form': form,
-            'titulo': 'Crear Evento',
-            'accion': 'crear'
+            'title': 'Crear Evento',
+            'action': 'crear'
         })
-    
-    return render(request, 'calendario/evento_form.html', {'form': form, 'titulo': 'Crear Evento'})
+    return render(request, 'calendar/partials/event_form.html', {'form': form, 'title': 'Crear Evento'})
 
 
-def editar_evento(request, pk):
-    """Editar evento existente"""
-    evento = get_object_or_404(Evento, pk=pk)
-    
+def edit_event(request, pk):
+    """Edit an existing event by primary key. Supports full page and HTMX."""
+    event = get_object_or_404(Event, pk=pk)
+
     if request.method == 'POST':
-        form = EventoForm(request.POST, instance=evento)
+        form = EventForm(request.POST, instance=event)
         if form.is_valid():
-            evento = form.save()
-            messages.success(request, f'Evento "{evento.nombre}" actualizado exitosamente.')
-            
+            event = form.save()
+            messages.success(request, f'Evento "{event.name}" actualizado exitosamente.')
+
             if request.htmx:
-                eventos = Evento.objects.all().order_by('fecha_inicio')
-                response = render(request, 'calendario/partials/eventos_lista.html', {'eventos': eventos})
-                response['HX-Trigger'] = 'eventoCerrado'
+                events = Event.objects.all().order_by('start_date')
+                response = render(request, 'calendar/partials/event_list.html', {'events': events})
+                response['HX-Trigger'] = 'eventClosed'
                 return response
-            
-            return redirect('lista_eventos')
+            return redirect('event_list')
     else:
-        form = EventoForm(instance=evento)
-    
+        form = EventForm(instance=event)
+
     if request.htmx:
-        return render(request, 'calendario/partials/evento_form.html', {
+        return render(request, 'calendar/partials/event_form.html', {
             'form': form,
-            'evento': evento,
-            'titulo': 'Editar Evento',
-            'accion': 'editar'
+            'event': event,
+            'title': 'Editar Evento',
+            'action': 'editar'
         })
-    
-    return render(request, 'calendario/evento_form.html', {'form': form, 'evento': evento, 'titulo': 'Editar Evento'})
+    return render(request, 'calendar/partials/event_form.html', {'form': form, 'event': event, 'title': 'Editar Evento'})
 
 
-def eliminar_evento(request, pk):
-    """Eliminar evento"""
-    evento = get_object_or_404(Evento, pk=pk)
-    
+def delete_event(request, pk):
+    """Delete an event after confirmation. Returns event list partial for HTMX or redirect."""
+    event = get_object_or_404(Event, pk=pk)
+
     if request.method == 'POST':
-        nombre_evento = evento.nombre
-        evento.delete()
-        messages.success(request, f'Evento "{nombre_evento}" eliminado exitosamente.')
-        
+        event_name = event.name
+        event.delete()
+        messages.success(request, f'Evento "{event_name}" eliminado exitosamente.')
+
         if request.htmx:
-            eventos = Evento.objects.all().order_by('fecha_inicio')
-            response = render(request, 'calendario/partials/eventos_lista.html', {'eventos': eventos})
-            response['HX-Trigger'] = 'eventoCerrado'
+            events = Event.objects.all().order_by('start_date')
+            response = render(request, 'calendar/partials/event_list.html', {'events': events})
+            response['HX-Trigger'] = 'eventClosed'
             return response
-        
-        return redirect('lista_eventos')
-    
+        return redirect('event_list')
+
     if request.htmx:
-        return render(request, 'calendario/partials/evento_eliminar.html', {'evento': evento})
-    
-    return render(request, 'calendario/evento_eliminar.html', {'evento': evento})
+        return render(request, 'calendar/partials/event_delete.html', {'event': event})
+    return render(request, 'calendar/partials/event_delete.html', {'event': event})
 
 
-def detalle_evento(request, pk):
-    """Ver detalle de un evento"""
-    evento = get_object_or_404(Evento, pk=pk)
-    
+def event_detail(request, pk):
+    """Show a single event's details. Renders partial for HTMX modal, full page otherwise."""
+    event = get_object_or_404(Event, pk=pk)
     if request.htmx:
-        return render(request, 'calendario/partials/evento_detalle.html', {'evento': evento})
-    
-    return render(request, 'calendario/evento_detalle.html', {'evento': evento})
+        return render(request, 'calendar/partials/event_detail.html', {'event': event})
+    return render(request, 'calendar/partials/event_detail.html', {'event': event})

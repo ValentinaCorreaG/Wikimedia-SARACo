@@ -26,18 +26,14 @@ urlpatterns = [
 ]
 
 from django.urls import path
-from ...wikimediacolombiasara import views
+from core import views as core_views
 
+# Note: project root urls.py includes core.urls; these patterns use English names for consistency
 urlpatterns = [
-    # Calendario
-    path('calendario/', views.calendario_vista, name='calendario'),
-    
-    # Eventos - Lista
-    path('eventos/', views.lista_eventos, name='lista_eventos'),
-    
-    # Eventos - CRUD
-    path('eventos/crear/', views.crear_evento, name='crear_evento'),
-    path('eventos/<int:pk>/', views.detalle_evento, name='detalle_evento'),
-    path('eventos/<int:pk>/editar/', views.editar_evento, name='editar_evento'),
-    path('eventos/<int:pk>/eliminar/', views.eliminar_evento, name='eliminar_evento'),
+    path('calendar/', core_views.calendar_view, name='calendar'),
+    path('events/', core_views.event_list, name='event_list'),
+    path('events/create/', core_views.create_event, name='create_event'),
+    path('events/<int:pk>/', core_views.event_detail, name='event_detail'),
+    path('events/<int:pk>/edit/', core_views.edit_event, name='edit_event'),
+    path('events/<int:pk>/delete/', core_views.delete_event, name='delete_event'),
 ]

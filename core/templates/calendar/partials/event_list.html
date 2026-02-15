@@ -1,57 +1,56 @@
-<!-- templates/calendario/partials/eventos_lista.html -->
+<!-- Event list partial: used by event list page and HTMX -->
 
-{% if eventos %}
+{% if events %}
 <div class="space-y-4">
-    {% for evento in eventos %}
+    {% for event in events %}
     <div class="border-2 border-blue-100 rounded-lg p-5 hover:shadow-lg transition-shadow bg-gradient-to-r from-white to-blue-50">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             
-            <!-- Información del evento -->
+            <!-- Event info (dates, area, participants) -->
             <div class="flex-1">
-                <h3 class="text-xl font-bold text-blue-900 mb-2">{{ evento.nombre }}</h3>
+                <h3 class="text-xl font-bold text-blue-900 mb-2">{{ event.name }}</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                     <div class="flex items-center text-blue-700">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span><strong>Inicio:</strong> {{ evento.fecha_inicio|date:"d/m/Y" }}</span>
+                        <span><strong>Inicio:</strong> {{ event.start_date|date:"d/m/Y" }}</span>
                     </div>
                     
                     <div class="flex items-center text-blue-700">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span><strong>Fin:</strong> {{ evento.fecha_fin|date:"d/m/Y" }}</span>
+                        <span><strong>Fin:</strong> {{ event.end_date|date:"d/m/Y" }}</span>
                     </div>
                     
                     <div class="flex items-center text-blue-700">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
-                        <span><strong>Área:</strong> {{ evento.area_responsable }}</span>
+                        <span><strong>Área:</strong> {{ event.responsible_area }}</span>
                     </div>
                     
                     <div class="flex items-center text-blue-700">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
-                        <span><strong>Participantes:</strong> {{ evento.participantes_esperados }}</span>
+                        <span><strong>Participantes:</strong> {{ event.expected_participants }}</span>
                     </div>
                 </div>
 
-                {% if evento.descripcion %}
-                <p class="mt-3 text-blue-800 text-sm">{{ evento.descripcion|truncatewords:20 }}</p>
+                {% if event.description %}
+                <p class="mt-3 text-blue-800 text-sm">{{ event.description|truncatewords:20 }}</p>
                 {% endif %}
             </div>
 
-            <!-- Botones de acción -->
+            <!-- Action buttons: view, edit, delete -->
             <div class="flex lg:flex-col gap-2">
                 <button class="flex-1 lg:flex-none px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
-                        hx-get="{% url 'detalle_evento' evento.pk %}"
-                        hx-target="#modal-container"
-                        hx-swap="innerHTML"
-                        onclick="document.getElementById('modal-container').classList.remove('hidden')">
+                        hx-get="{% url 'event_detail' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
                     <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -60,10 +59,9 @@
                 </button>
                 
                 <button class="flex-1 lg:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                        hx-get="{% url 'editar_evento' evento.pk %}"
-                        hx-target="#modal-container"
-                        hx-swap="innerHTML"
-                        onclick="document.getElementById('modal-container').classList.remove('hidden')">
+                        hx-get="{% url 'edit_event' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
                     <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
@@ -71,10 +69,9 @@
                 </button>
                 
                 <button class="flex-1 lg:flex-none px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
-                        hx-get="{% url 'eliminar_evento' evento.pk %}"
-                        hx-target="#modal-container"
-                        hx-swap="innerHTML"
-                        onclick="document.getElementById('modal-container').classList.remove('hidden')">
+                        hx-get="{% url 'delete_event' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
                     <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
@@ -86,6 +83,7 @@
     {% endfor %}
 </div>
 {% else %}
+<!-- Empty state: no events yet -->
 <div class="text-center py-16">
     <svg class="w-24 h-24 mx-auto text-blue-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -93,10 +91,9 @@
     <h3 class="text-xl font-semibold text-blue-900 mb-2">No hay eventos</h3>
     <p class="text-blue-600 mb-6">Comienza creando tu primer evento</p>
     <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl font-medium"
-            hx-get="{% url 'crear_evento' %}"
-            hx-target="#modal-container"
-            hx-swap="innerHTML"
-            onclick="document.getElementById('modal-container').classList.remove('hidden')">
+            hx-get="{% url 'create_event' %}"
+            hx-target="#modal-box-content"
+            hx-swap="innerHTML">
         <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>

@@ -1,47 +1,71 @@
-from django import forms
-from .models import Evento
+"""
+Core app forms.
 
-class EventoForm(forms.ModelForm):
+ModelForm for Event with custom widgets and cross-field validation.
+"""
+from django import forms
+from django.utils import timezone
+from .models import Event
+
+
+class EventForm(forms.ModelForm):
+    """Form for creating and editing events. Validates that end date is not before start date."""
+
     class Meta:
-        model = Evento
-        fields = ['nombre', 'fecha_inicio', 'fecha_fin', 'area_responsable', 'participantes_esperados', 'descripcion']
+        model = Event
+        fields = ['name', 'start_date', 'end_date', 'responsible_area', 'expected_participants', 'description']
         widgets = {
-            'nombre': forms.TextInput(attrs={
+            'name': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent',
                 'placeholder': 'Ej: Reunión mensual'
             }),
-            'fecha_inicio': forms.DateInput(attrs={  # ← Cambiar de DateTimeInput a DateInput
+            'start_date': forms.DateInput(attrs={
                 'type': 'date',
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent'
             }),
-            'fecha_fin': forms.DateInput(attrs={  # ← Cambiar de DateTimeInput a DateInput
-                'type': 'date',  
+            'end_date': forms.DateInput(attrs={
+                'type': 'date',
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent'
             }),
-            
-            'area_responsable': forms.TextInput(attrs={
+            'responsible_area': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent',
                 'placeholder': 'Ej: Comunicaciones'
             }),
-            'participantes_esperados': forms.NumberInput(attrs={
+            'expected_participants': forms.NumberInput(attrs={
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent',
                 'min': '1',
                 'placeholder': 'Número de participantes'
             }),
-            'descripcion': forms.Textarea(attrs={
+            'description': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-300 focus:border-transparent',
                 'rows': 4,
                 'placeholder': 'Descripción del evento (opcional)'
             }),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        fecha_inicio = cleaned_data.get('fecha_inicio')
-        fecha_fin = cleaned_data.get('fecha_fin')
+    def clean_start_date(self):
+        """Reject start date in the past."""
+        start_date = self.cleaned_data.get('start_date')
+        if start_date and start_date < timezone.now().date():
+            raise forms.ValidationError('La fecha de inicio no puede ser anterior a hoy.')
+        return start_date
 
-        if fecha_inicio and fecha_fin:
-            if fecha_fin < fecha_inicio:
-                raise forms.ValidationError('La fecha de fin debe ser posterior a la fecha de inicio.')
+    def clean_expected_participants(self):
+        """Ensure at least one participant."""
+        value = self.cleaned_data.get('expected_participants')
+        if value is not None and value < 1:
+            raise forms.ValidationError('Debe haber al menos 1 participante.')
+        return value
+
+    def clean(self):
+        """Ensure end date is not before start date."""
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        end_date = cleaned_data.get('end_date')
+
+        if start_date and end_date and end_date < start_date:
+            raise forms.ValidationError(
+                'La fecha de fin debe ser igual o posterior a la fecha de inicio.'
+            )
 
         return cleaned_data

@@ -6,15 +6,15 @@
 <div class="min-h-screen bg-base-200 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Encabezado -->
+        <!-- Page header -->
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-base-content mb-2">Calendario de Eventos</h1>
             <p class="text-base-content opacity-70">Gestiona y visualiza todos tus eventos</p>
         </div>
 
-        <!-- Mensajes -->
+        <!-- Flash messages -->
         {% if messages %}
-        <div id="mensajes" class="mb-6 space-y-2">
+        <div id="messages" class="mb-6 space-y-2">
             {% for message in messages %}
             <div class="alert alert-info shadow-lg animate-fade-in">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
@@ -26,17 +26,17 @@
         </div>
         {% endif %}
 
-        <!-- Navegación entre vistas -->
+        <!-- Calendar vs list view navigation -->
         <div class="mb-6 flex gap-3">
-            <a href="{% url 'calendario' %}" 
-               class="btn btn-primary {% if request.path == '/calendario/' %}btn-active{% endif %}">
+            <a href="{% url 'calendar' %}" 
+               class="btn btn-primary {% if request.path == '/calendar/' %}btn-active{% endif %}">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 Vista Calendario
             </a>
-            <a href="{% url 'lista_eventos' %}" 
-               class="btn btn-outline btn-primary {% if request.path == '/eventos/' %}btn-active{% endif %}">
+            <a href="{% url 'event_list' %}" 
+               class="btn btn-outline btn-primary {% if request.path == '/events/' %}btn-active{% endif %}">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                 </svg>
@@ -44,13 +44,13 @@
             </a>
         </div>
 
-        <!-- Contenedor del Calendario -->
+        <!-- Calendar container -->
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body p-6 lg:p-8">
                 
-                <!-- Navegación del mes -->
+                <!-- Month navigation (prev/next) -->
                 <div class="flex items-center justify-between mb-6">
-                    <a href="?mes={{ mes_anterior }}&anio={{ anio_anterior }}" 
+                    <a href="?mes={{ prev_month }}&anio={{ prev_year }}" 
                        class="btn btn-circle btn-ghost">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -58,10 +58,10 @@
                     </a>
                     
                     <h2 class="text-2xl font-bold text-base-content capitalize">
-                        {{ nombre_mes }} {{ anio }}
+                        {{ month_name }} {{ year }}
                     </h2>
                     
-                    <a href="?mes={{ mes_siguiente }}&anio={{ anio_siguiente }}" 
+                    <a href="?mes={{ next_month }}&anio={{ next_year }}" 
                        class="btn btn-circle btn-ghost">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -69,33 +69,32 @@
                     </a>
                 </div>
 
-                <!-- Grid del Calendario -->
+                <!-- Calendar grid (7 columns = weekdays) -->
                 <div class="grid grid-cols-7 gap-1 lg:gap-2">
-                    <!-- Encabezados de días -->
-                    {% for dia in dias_semana %}
+                    <!-- Weekday headers -->
+                    {% for day_label in week_days %}
                     <div class="text-center font-semibold text-base-content py-3 text-sm lg:text-base">
-                        {{ dia }}
+                        {{ day_label }}
                     </div>
                     {% endfor %}
 
-                    <!-- Días del mes -->
-                    {% for semana in semanas %}
-                        {% for dia in semana %}
-                            {% if dia %}
-                            <div class="min-h-24 lg:min-h-32 border-2 {% if dia.es_hoy %}border-primary bg-primary bg-opacity-10{% else %}border-base-300{% endif %} rounded-lg p-2 hover:shadow-md transition-shadow bg-base-100">
-                                <div class="font-semibold text-base-content mb-1 {% if dia.es_hoy %}text-primary{% endif %}">
-                                    {{ dia.numero }}
+                    <!-- Days of the month (up to 6 rows) -->
+                    {% for week in weeks %}
+                        {% for day in week %}
+                            {% if day %}
+                            <div class="min-h-24 lg:min-h-32 border-2 border-base-300 rounded-lg p-2 hover:shadow-md transition-shadow bg-base-100">
+                                <div class="font-semibold text-base-content mb-1 {% if day.is_today %}text-primary{% endif %}">
+                                    {{ day.day_number }}
                                 </div>
                                 
-                                <!-- Eventos del día -->
+                                <!-- Events for this day -->
                                 <div class="space-y-1">
-                                    {% for evento in dia.eventos %}
+                                    {% for event in day.events %}
                                     <div class="text-xs bg-primary bg-opacity-20 text-primary-content px-2 py-1 rounded truncate cursor-pointer hover:bg-opacity-30 transition-colors"
-                                         hx-get="{% url 'detalle_evento' evento.pk %}"
-                                         hx-target="#modal-container"
-                                         hx-swap="innerHTML"
-                                         onclick="document.getElementById('modal-container').classList.remove('hidden')">
-                                        {{ evento.nombre }}
+                                         hx-get="{% url 'event_detail' event.pk %}"
+                                         hx-target="#modal-box-content"
+                                         hx-swap="innerHTML">
+                                        {{ event.name }}
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -107,13 +106,12 @@
                     {% endfor %}
                 </div>
 
-                <!-- Botón para crear evento -->
+                <!-- Create new event button -->
                 <div class="mt-6 text-center">
                     <button class="btn btn-primary btn-lg gap-2"
-                            hx-get="{% url 'crear_evento' %}"
-                            hx-target="#modal-container"
-                            hx-swap="innerHTML"
-                            onclick="document.getElementById('modal-container').classList.remove('hidden')">
+                            hx-get="{% url 'create_event' %}"
+                            hx-target="#modal-box-content"
+                            hx-swap="innerHTML">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -125,24 +123,40 @@
     </div>
 </div>
 
-<!-- Contenedor del Modal -->
-<div id="modal-container" class="hidden"></div>
+<!-- DaisyUI modal (HTMX loads partials into modal-box-content) -->
+<dialog id="modal-container" class="modal">
+    <div id="modal-box-content" class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+        <!-- HTMX swaps content here -->
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button type="submit" class="cursor-default w-full h-full min-h-screen" aria-label="Cerrar"></button>
+    </form>
+</dialog>
 
 <script>
-    // Auto-ocultar mensajes después de 5 segundos
+    // Auto-hide flash messages after 5 seconds
     setTimeout(function() {
-        const mensajes = document.getElementById('mensajes');
-        if (mensajes) {
-            mensajes.style.opacity = '0';
-            mensajes.style.transition = 'opacity 0.5s';
-            setTimeout(() => mensajes.remove(), 500);
+        const messagesEl = document.getElementById('messages');
+        if (messagesEl) {
+            messagesEl.style.opacity = '0';
+            messagesEl.style.transition = 'opacity 0.5s';
+            setTimeout(() => messagesEl.remove(), 500);
         }
     }, 5000);
 
-    // Escuchar evento para cerrar modal
-    document.body.addEventListener('eventoCerrado', function() {
-        document.getElementById('modal-container').classList.add('hidden');
-        document.getElementById('modal-container').innerHTML = '';
+    // Open DaisyUI modal when HTMX swaps content into it
+    document.body.addEventListener('htmx:afterSwap', function(ev) {
+        if (ev.detail?.target?.id === 'modal-box-content') {
+            document.getElementById('modal-container').showModal();
+        }
+    });
+
+    // Close modal and clear content when form is submitted or modal is dismissed
+    document.body.addEventListener('eventClosed', function() {
+        var dialog = document.getElementById('modal-container');
+        var box = document.getElementById('modal-box-content');
+        if (dialog) dialog.close();
+        if (box) box.innerHTML = '';
     });
 </script>
 
