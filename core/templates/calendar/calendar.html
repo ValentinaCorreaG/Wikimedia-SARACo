@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Calendario de Eventos{% endblock %}
 
@@ -11,20 +12,6 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-base-content mb-1">Calendario de Eventos</h1>
             <p class="text-sm sm:text-base text-base-content opacity-70">Gestiona y visualiza todos tus eventos</p>
         </div>
-
-        <!-- Flash messages -->
-        {% if messages %}
-        <div id="messages" class="mb-6 space-y-2">
-            {% for message in messages %}
-            <div class="alert alert-info shadow-lg animate-fade-in">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{{ message }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
 
         <!-- Calendar vs list view navigation -->
         <div class="mb-6 flex gap-3">
@@ -148,30 +135,5 @@
     </form>
 </dialog>
 
-<script>
-    // Auto-hide flash messages after 5 seconds
-    setTimeout(function() {
-        const messagesEl = document.getElementById('messages');
-        if (messagesEl) {
-            messagesEl.style.opacity = '0';
-            messagesEl.style.transition = 'opacity 0.5s';
-            setTimeout(() => messagesEl.remove(), 500);
-        }
-    }, 5000);
-
-    // Open DaisyUI modal when HTMX swaps content into it
-    document.body.addEventListener('htmx:afterSwap', function(ev) {
-        if (ev.detail?.target?.id === 'modal-box-content') {
-            document.getElementById('modal-container').showModal();
-        }
-    });
-
-    // Close modal and clear content when form is submitted or modal is dismissed
-    document.body.addEventListener('eventClosed', function() {
-        var dialog = document.getElementById('modal-container');
-        var box = document.getElementById('modal-box-content');
-        if (dialog) dialog.close();
-        if (box) box.innerHTML = '';
-    });
-</script>
+<script src="{% static 'js/modal.js' %}"></script>
 {% endblock %}
