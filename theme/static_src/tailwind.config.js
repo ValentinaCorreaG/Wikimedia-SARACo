@@ -43,16 +43,25 @@ module.exports = {
     ],
     theme: {
         extend: {
+            animation: {
+                'fade-in': 'fadeIn 0.3s ease-out',
+            },
+            keyframes: {
+                fadeIn: {
+                    'from': { opacity: '0', transform: 'translateY(-10px)' },
+                    'to': { opacity: '1', transform: 'translateY(0)' },
+                }
+            },
             colors: {
                 /* -----------------------------
                 * Brand / Neutral (Wikimedia-style)
                 * ----------------------------- */
                 primary: {
                     900: "#202122",
-                    700: "#404244",
-                    500: "#54595D",
-                    300: "#A2A9B1",
-                    100: "#EAECF0",
+                    700: "#1A5DAA",
+                    500: "#3399FF",
+                    300: "#99CCFF",
+                    100: "#E6F2FF",
                 },
         
                 /* -----------------------------
@@ -121,7 +130,7 @@ module.exports = {
             {
                 wikimedia: {
                     /* Brand Accent – links, primary buttons */
-                    "primary":          "#3366CC",
+                    "primary":          "#3399FF",
                     "primary-content":  "#FFFFFF",
 
                     /* Secondary – neutral UI chrome */
@@ -129,7 +138,7 @@ module.exports = {
                     "secondary-content":"#FFFFFF",
 
                     /* Accent – hover / highlight states */
-                    "accent":           "#447FF5",
+                    "accent":           "#3399FF",
                     "accent-content":   "#FFFFFF",
 
                     /* Neutral – text, dark surfaces */

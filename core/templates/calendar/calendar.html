@@ -3,13 +3,13 @@
 {% block title %}Calendario de Eventos{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-base-200 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-base-200 py-4 sm:py-6 md:py-8">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
         
         <!-- Page header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-base-content mb-2">Calendario de Eventos</h1>
-            <p class="text-base-content opacity-70">Gestiona y visualiza todos tus eventos</p>
+        <div class="mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-base-content mb-1">Calendario de Eventos</h1>
+            <p class="text-sm sm:text-base text-base-content opacity-70">Gestiona y visualiza todos tus eventos</p>
         </div>
 
         <!-- Flash messages -->
@@ -45,35 +45,35 @@
         </div>
 
         <!-- Calendar container -->
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body p-6 lg:p-8">
+        <div class="card bg-base-100 shadow-lg sm:shadow-xl">
+            <div class="card-body p-4 sm:p-5 md:p-6">
                 
                 <!-- Month navigation (prev/next) -->
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-4 sm:mb-5">
                     <a href="?mes={{ prev_month }}&anio={{ prev_year }}" 
-                       class="btn btn-circle btn-ghost">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="btn btn-circle btn-ghost btn-sm sm:btn-md">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
                     </a>
                     
-                    <h2 class="text-2xl font-bold text-base-content capitalize">
+                    <h2 class="text-xl sm:text-2xl font-bold text-base-content capitalize">
                         {{ month_name }} {{ year }}
                     </h2>
                     
                     <a href="?mes={{ next_month }}&anio={{ next_year }}" 
-                       class="btn btn-circle btn-ghost">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="btn btn-circle btn-ghost btn-sm sm:btn-md">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </a>
                 </div>
 
                 <!-- Calendar grid (7 columns = weekdays) -->
-                <div class="grid grid-cols-7 gap-1 lg:gap-2">
+                <div class="grid grid-cols-7 gap-0.5 sm:gap-1">
                     <!-- Weekday headers -->
                     {% for day_label in week_days %}
-                    <div class="text-center font-semibold text-base-content py-3 text-sm lg:text-base">
+                    <div class="text-center font-semibold text-base-content py-2 sm:py-3 text-xs sm:text-sm">
                         {{ day_label }}
                     </div>
                     {% endfor %}
@@ -82,40 +82,50 @@
                     {% for week in weeks %}
                         {% for day in week %}
                             {% if day %}
-                            <div class="min-h-24 lg:min-h-32 border-2 border-base-300 rounded-lg p-2 hover:shadow-md transition-shadow bg-base-100">
-                                <div class="font-semibold text-base-content mb-1 {% if day.is_today %}text-primary{% endif %}">
+                            <div class="min-h-16 sm:min-h-20 md:min-h-24 border border-base-300 rounded p-1 sm:p-2 hover:shadow-sm transition-shadow bg-base-100">
+                                <div class="font-semibold text-base-content text-xs sm:text-sm {% if day.is_today %}text-primary{% endif %}">
                                     {{ day.day_number }}
                                 </div>
                                 
                                 <!-- Events for this day -->
-                                <div class="space-y-1">
+                                <div class="space-y-0.5 mt-1">
                                     {% for event in day.events %}
-                                    <div class="text-xs bg-primary bg-opacity-20 text-primary-content px-2 py-1 rounded truncate cursor-pointer hover:bg-opacity-30 transition-colors"
+                                    <div class="text-xs px-1.5 py-0.5 rounded truncate cursor-pointer transition-colors font-semibold
+                                        {% if event.responsible_area == 'Apropiación social de conocimiento' %}
+                                            bg-blue-200 text-blue-900 hover:bg-blue-300
+                                        {% elif event.responsible_area == 'tecnologías y comunidades' %}
+                                            bg-green-200 text-green-900 hover:bg-green-300
+                                        {% elif event.responsible_area == 'otra' %}
+                                            bg-purple-200 text-purple-900 hover:bg-purple-300
+                                        {% else %}
+                                            bg-primary bg-opacity-20 text-primary-content hover:bg-opacity-30
+                                        {% endif %}"
                                          hx-get="{% url 'event_detail' event.pk %}"
                                          hx-target="#modal-box-content"
-                                         hx-swap="innerHTML">
+                                         hx-swap="innerHTML"
+                                         title="{{ event.name }}">
                                         {{ event.name }}
                                     </div>
                                     {% endfor %}
                                 </div>
                             </div>
                             {% else %}
-                            <div class="min-h-24 lg:min-h-32 border-2 border-transparent"></div>
+                            <div class="min-h-16 sm:min-h-20 md:min-h-24 border border-transparent"></div>
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
                 </div>
 
                 <!-- Create new event button -->
-                <div class="mt-6 text-center">
-                    <button class="btn btn-primary btn-lg gap-2"
+                <div class="mt-4 sm:mt-5 text-center">
+                    <button class="btn btn-primary btn-sm sm:btn-md gap-2"
                             hx-get="{% url 'create_event' %}"
                             hx-target="#modal-box-content"
                             hx-swap="innerHTML">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Crear Nuevo Evento
+                        Crear Evento
                     </button>
                 </div>
             </div>
@@ -125,11 +135,16 @@
 
 <!-- DaisyUI modal (HTMX loads partials into modal-box-content) -->
 <dialog id="modal-container" class="modal">
-    <div id="modal-box-content" class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
-        <!-- HTMX swaps content here -->
+    <div class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto relative">
+        <form method="dialog" class="absolute right-2 top-2">
+            <button type="submit" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar">✕</button>
+        </form>
+        <div id="modal-box-content">
+            <!-- HTMX swaps content here -->
+        </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-        <button type="submit" class="cursor-default w-full h-full min-h-screen" aria-label="Cerrar"></button>
+        <button></button>
     </form>
 </dialog>
 
@@ -159,34 +174,4 @@
         if (box) box.innerHTML = '';
     });
 </script>
-
-<style>
-    @keyframes fade-in {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-        animation: fade-in 0.3s ease-out;
-    }
-    
-    svg {
-        flex-shrink: 0;
-    }
-    
-    .btn svg,
-    button svg {
-        width: 1.25rem !important;
-        height: 1.25rem !important;
-    }
-    
-    .btn-lg svg {
-        width: 1.5rem !important;
-        height: 1.5rem !important;
-    }
-    
-    .btn-circle svg {
-        width: 1.5rem !important;
-        height: 1.5rem !important;
-    }
-</style>
 {% endblock %}

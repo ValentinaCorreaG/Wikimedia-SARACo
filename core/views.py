@@ -86,21 +86,28 @@ def calendar_view(request):
 
 def event_list(request):
     """
-    Event list view. Supports search via GET param 'busqueda'.
+    Event list view. Supports search via GET param 'busqueda' and area filter.
     Returns a partial template when requested via HTMX, full page otherwise.
     """
+    from .forms import AREA_CHOICES
+    
     events = Event.objects.all().order_by('start_date')
     search = request.GET.get('busqueda', '')
+    area_filter = request.GET.get('area', '')
+    
     if search:
         events = events.filter(
             Q(name__icontains=search) |
             Q(responsible_area__icontains=search) |
             Q(description__icontains=search)
         )
+    
+    if area_filter:
+        events = events.filter(responsible_area=area_filter)
 
     if request.htmx:
         return render(request, 'calendar/partials/event_list.html', {'events': events})
-    return render(request, 'calendar/event_list.html', {'events': events})
+    return render(request, 'calendar/event_list.html', {'events': events, 'area_choices': AREA_CHOICES})
 
 
 def create_event(request):
