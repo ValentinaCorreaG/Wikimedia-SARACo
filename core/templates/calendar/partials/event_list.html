@@ -1,0 +1,140 @@
+<!-- Event list partial: used by event list page and HTMX -->
+
+{% if events %}
+<div class="space-y-3 sm:space-y-4">
+    {% for event in events %}
+    <div class="border-2 rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow
+        {% if event.responsible_area == 'Apropiación social de conocimiento' %}
+            border-blue-400 bg-blue-100
+        {% elif event.responsible_area == 'tecnologías y comunidades' %}
+            border-green-400 bg-green-100
+        {% elif event.responsible_area == 'otra' %}
+            border-purple-400 bg-purple-100
+        {% else %}
+            border-gray-400 bg-gray-100
+        {% endif %}">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            
+            <!-- Event info (dates, area, participants) -->
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2 flex-wrap">
+                    <h3 class="text-lg sm:text-xl font-bold text-base-content">{{ event.name }}</h3>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
+                        {% if event.responsible_area == 'Apropiación social de conocimiento' %}
+                            bg-blue-200 text-blue-900
+                        {% elif event.responsible_area == 'tecnologías y comunidades' %}
+                            bg-green-200 text-green-900
+                        {% elif event.responsible_area == 'otra' %}
+                            bg-purple-200 text-purple-900
+                        {% else %}
+                            bg-gray-200 text-gray-900
+                        {% endif %}">
+                        {% if event.responsible_area == 'Apropiación social de conocimiento' %}
+                            Apropiación social
+                        {% elif event.responsible_area == 'tecnologías y comunidades' %}
+                            Tecnología
+                        {% else %}
+                            {{ event.responsible_area|upper }}
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+                    <div class="flex items-start sm:items-center text-base-content">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span><strong>Inicio:</strong> {{ event.start_date|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    <div class="flex items-start sm:items-center text-base-content">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span><strong>Fin:</strong> {{ event.end_date|date:"d/m/Y" }}</span>
+                    </div>
+                    
+                    <div class="flex items-start sm:items-center text-base-content">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <span><strong>Área:</strong> 
+                            {% if event.responsible_area == 'Apropiación social de conocimiento' %}
+                                Apropiación social
+                            {% elif event.responsible_area == 'tecnologías y comunidades' %}
+                                Tecnologías y comunidades
+                            {% else %}
+                                {{ event.responsible_area }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-start sm:items-center text-base-content">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span><strong>Participantes:</strong> {{ event.expected_participants }}</span>
+                    </div>
+                </div>
+
+                {% if event.description %}
+                <p class="mt-2 sm:mt-3 text-base-content/80 text-xs sm:text-sm">{{ event.description|truncatewords:20 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Action buttons: view, edit, delete -->
+            <div class="flex lg:flex-col gap-2 flex-wrap sm:flex-nowrap">
+                <button class="flex-1 lg:flex-none px-3 py-2 bg-primary/20 text-primary rounded-lg hover:bg-primary/30 transition-colors text-xs sm:text-sm font-medium"
+                        hx-get="{% url 'event_detail' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    Ver
+                </button>
+                
+                <button class="flex-1 lg:flex-none px-3 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary-focus transition-colors text-xs sm:text-sm font-medium"
+                        hx-get="{% url 'edit_event' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Editar
+                </button>
+                
+                <button class="flex-1 lg:flex-none px-3 py-2 bg-error/20 text-error rounded-lg hover:bg-error/30 transition-colors text-xs sm:text-sm font-medium"
+                        hx-get="{% url 'delete_event' event.pk %}"
+                        hx-target="#modal-box-content"
+                        hx-swap="innerHTML">
+                    <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Empty state: no events yet -->
+<div class="text-center py-12 sm:py-16">
+    <svg class="w-20 h-20 sm:w-24 sm:h-24 mx-auto text-primary/30 mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <h3 class="text-lg sm:text-xl font-semibold text-base-content mb-2">No hay eventos</h3>
+    <p class="text-base-content/70 mb-4 sm:mb-6 text-sm sm:text-base">Comienza creando tu primer evento</p>
+    <button class="px-4 sm:px-6 py-2 sm:py-3 bg-primary text-primary-content rounded-lg hover:bg-primary-focus transition-colors shadow-md hover:shadow-lg font-medium text-sm sm:text-base"
+            hx-get="{% url 'create_event' %}"
+            hx-target="#modal-box-content"
+            hx-swap="innerHTML">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Crear Evento
+    </button>
+</div>
+{% endif %}
