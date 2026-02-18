@@ -14,9 +14,9 @@ from .models import Event
 from .forms import EventForm
 
 
-def home(request):
+def base(request):
     """Render the home page."""
-    return render(request, 'home.html')
+    return render(request, 'base.html')
 
 
 def calendar_view(request):

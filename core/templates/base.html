@@ -1,40 +1,12 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="wikimedia">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Wikimedia Colombia SARA{% endblock %}</title>
     
-    <!-- Tailwind CSS + DaisyUI via CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Force consistent SVG icon dimensions */
-        svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        
-        /* Icons inside buttons */
-        .btn svg {
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-        
-        /* Larger icons in large buttons */
-        .btn-lg svg {
-            width: 1.5rem;
-            height: 1.5rem;
-        }
-        
-        /* Icons in calendar event cells */
-        .evento-icono svg {
-            width: 0.875rem;
-            height: 0.875rem;
-        }
-    </style>
+    {% tailwind_css %}
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
