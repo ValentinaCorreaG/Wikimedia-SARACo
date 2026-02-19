@@ -10,27 +10,35 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 import environ
+
+# Initialize environ
+env = environ.Env(
+    # Set casting and default values
+    DEBUG=(bool, False),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-environ.Env.read_env(BASE_DIR / '.env')
+# Read .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-swn69r5c4)%-fb*3v=)2gj2dj!)$#%+s%4la4z-vc#_492@k*5'
+SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-swn69r5c4)%-fb*3v=)2gj2dj!)$#%+s%4la4z-vc#_492@k*5')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DJANGO_DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+
 
 # Application definition
 
@@ -42,10 +50,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tailwind',
-    'django_browser_reload', 
-    'theme',  # will be created next
+    'django_browser_reload',  # optional, for auto-reload
+    'theme',
     'core',
+    'users.apps.UsersConfig',  # Users app with authentication
     'django_htmx',
+    'social_django',  # OAuth authentication
 ]
 
 MIDDLEWARE = [
@@ -58,6 +68,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
     'django_htmx.middleware.HtmxMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',  # OAuth error handling
 ]
 
 ROOT_URLCONF = 'wikimediacolombiasara.urls'
@@ -73,6 +84,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',  # OAuth backends
+                'social_django.context_processors.login_redirect',  # OAuth redirects
             ],
         },
     },
@@ -92,6 +105,51 @@ DATABASES = {
 }
 
 
+# Authentication Backends
+# https://docs.djangoproject.com/en/4.2/topics/auth/customizing/#authentication-backends
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.mediawiki.MediaWiki',  # Wikimedia OAuth
+    'django.contrib.auth.backends.ModelBackend',  # Django default
+)
+
+# Social Auth Configuration
+SOCIAL_AUTH_MEDIAWIKI_KEY = env('MEDIAWIKI_OAUTH_KEY', default='')
+SOCIAL_AUTH_MEDIAWIKI_SECRET = env('SOCIAL_AUTH_MEDIAWIKI_SECRET', default='')
+SOCIAL_AUTH_MEDIAWIKI_URL = env('MEDIAWIKI_URL', default='https://meta.wikimedia.org/w/index.php')
+SOCIAL_AUTH_MEDIAWIKI_CALLBACK = 'http://127.0.0.1:8000/oauth/complete/mediawiki/oob'
+
+# Social Auth Pipeline with custom steps
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'users.pipeline.associate_by_wiki_handle',  # Custom: Match existing users
+    'users.pipeline.get_username',  # Custom: Handle username conflicts
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'users.pipeline.log_authentication_success',  # Custom: Logging
+)
+
+# Social Auth Settings
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['groups']
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/'
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+CSRF_TRUSTED_ORIGINS = ['https://meta.wikimedia.org']
+# Login/Logout URLs
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_MEDIAWIKI_IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_MEDIAWIKI_SCOPE = ['identify']
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -114,16 +172,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-# Configuración de idioma para fechas en español
-LANGUAGE_CODE = 'es-mx'
-TIME_ZONE = 'America/Bogota'  # Ajusta según tu zona horaria
-USE_I18N = True
-USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -136,3 +190,105 @@ NPM_BIN_PATH = env('NPM_BIN_PATH')
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# ============================================================================
+# SECURITY SETTINGS (High Priority Improvements)
+# ============================================================================
+
+# Session Security
+SESSION_COOKIE_SECURE = not DEBUG  # Only send over HTTPS in production
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+SESSION_COOKIE_AGE = 86400  # 24 hours
+
+# CSRF Security
+CSRF_COOKIE_SECURE = not DEBUG  # Only send over HTTPS in production
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Security Headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# HTTPS Settings (for production)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# ============================================================================
+# LOGGING CONFIGURATION (High Priority Improvements)
+# ============================================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'auth_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'auth.log',
+            'maxBytes': 1024 * 1024 * 10,  # 10 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'users': {
+            'handlers': ['console', 'auth_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'social_auth': {
+            'handlers': ['console', 'auth_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
+
+# Create logs directory if it doesn't exist
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)

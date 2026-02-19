@@ -1,146 +1,235 @@
 # Wikimedia Colombia SARA
 
-A Django web application built with HTMX and Tailwind CSS.
+A modern Django web application with Wikimedia OAuth authentication, built with HTMX and Tailwind CSS.
 
-## Tech Stack
+## ✨ Features
 
-- **Django 4.2** - Python web framework
-- **HTMX** - Modern frontend interactivity without heavy JavaScript
-- **Tailwind CSS** - Utility-first CSS framework
-- **django-tailwind** - Tailwind CSS integration for Django
-- **django-htmx** - HTMX integration for Django
+- 🔐 **Wikimedia OAuth Authentication** - Secure login with Wikimedia accounts
+- 🎨 **Modern UI** - Beautiful interface with Tailwind CSS and DaisyUI
+- ⚡ **HTMX Integration** - Dynamic interactions without heavy JavaScript
+- 🛡️ **Security First** - Session security, logging, and best practices
+- 📱 **Responsive Design** - Mobile-first approach
+- 🧪 **Comprehensive Tests** - Full test coverage for authentication
+- 📊 **User Management** - Profiles, teams, and positions
 
-## Prerequisites
+## 🚀 Tech Stack
+
+- **Backend**: Django 4.2+
+- **Frontend**: HTMX + Tailwind CSS + DaisyUI
+- **Authentication**: Python Social Auth (Wikimedia OAuth)
+- **Database**: SQLite (development) / PostgreSQL (production ready)
+- **Testing**: Django Test Framework
+
+## 📋 Prerequisites
 
 - Python 3.10+
 - Node.js 18+ (for Tailwind CSS compilation)
 - npm or yarn
+- A Wikimedia account (for OAuth setup)
 
-## Installation
+## 🔧 Quick Start
 
-### 1. Clone the repository
+### 1. Clone and Setup
 
 ```bash
 git clone <repository-url>
 cd wikimedia-colombia-sara
-```
 
-### 2. Create and activate a virtual environment
-
-```bash
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-### 3. Install Python dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
-
-### 4. Install Tailwind CSS dependencies
-
-```bash
 python manage.py tailwind install
 ```
 
-### 5. Run database migrations
+### 2. Configure OAuth
+
+1. Register your app at [Wikimedia OAuth](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration)
+2. Copy `.env.example` to `.env`
+3. Add your OAuth credentials to `.env`
+
+See [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for detailed instructions.
+
+### 3. Database Setup
 
 ```bash
 python manage.py migrate
+python manage.py createsuperuser  # Optional
 ```
 
-### 6. Create a superuser (optional)
+### 4. Run Development Servers
 
-```bash
-python manage.py createsuperuser
-```
-
-## Development
-
-You need to run **two terminals** during development:
-
-### Terminal 1: Tailwind CSS compiler
-
+**Terminal 1 - Tailwind CSS:**
 ```bash
 python manage.py tailwind start
 ```
 
-This watches for changes in your templates and recompiles the CSS.
-
-### Terminal 2: Django development server
-
+**Terminal 2 - Django:**
 ```bash
 python manage.py runserver
 ```
 
-The application will be available at `http://127.0.0.1:8000/`
+Visit `http://127.0.0.1:8000/`
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 wikimedia-colombia-sara/
-├── core/                   # Main application
-│   ├── views.py            # View functions
-│   ├── models.py           # Database models
-│   └── ...
-├── theme/                  # Tailwind CSS app
+├── core/                      # Main application
+├── users/                     # Authentication & user management
+│   ├── models.py             # User, UserProfile, TeamArea, Position
+│   ├── views.py              # Authentication views
+│   ├── pipeline.py           # Custom OAuth pipeline
+│   ├── tests.py              # Comprehensive test suite
+│   ├── templates/            # User templates
+│   │   └── users/
+│   │       ├── login.html
+│   │       ├── profile.html
+│   │       └── partials/     # HTMX partials
+│   └── urls.py
+├── theme/                     # Tailwind CSS app
 │   ├── static/
-│   │   └── css/
-│   │       └── dist/
-│   │           └── styles.css  # Compiled CSS (auto-generated)
-│   ├── static_src/
-│   │   ├── src/
-│   │   │   └── styles.css      # Source CSS with Tailwind directives
-│   │   ├── tailwind.config.js  # Tailwind configuration
-│   │   └── package.json        # Node.js dependencies
+│   │   └── css/dist/         # Compiled CSS
+│   ├── static_src/           # Source files
+│   │   ├── src/styles.css
+│   │   └── tailwind.config.js
 │   └── templates/
-│       └── base.html           # Base template
-├── wikimediacolombiasara/  # Django project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── ...
-├── manage.py
-└── requirements.txt
+│       ├── base.html
+│       └── partials/
+│           └── sidebar.html
+├── wikimediacolombiasara/    # Django settings
+│   ├── settings.py           # With security & logging
+│   └── urls.py
+├── logs/                      # Application logs
+├── .env.example              # Environment template
+├── requirements.txt
+├── AUTHENTICATION_SETUP.md   # Detailed auth guide
+└── README.md
 ```
 
-## Building for Production
+## 🔐 Authentication Features
 
-### Compile Tailwind CSS for production
+### Implemented High-Priority Improvements
+
+✅ **Session Security**
+- Secure cookies (HTTPS only in production)
+- HTTPOnly and SameSite protection
+- 24-hour session timeout
+
+✅ **Comprehensive Logging**
+- Authentication event logging
+- Rotating log files (10MB, 5 backups)
+- Separate auth and general logs
+
+✅ **Error Handling**
+- User-friendly error messages
+- Detailed admin logging
+- HTMX-aware responses
+
+✅ **Testing**
+- Pipeline function tests
+- View permission tests
+- HTMX integration tests
+- Model creation tests
+
+### Authentication Flow
+
+1. User clicks "Sign in with Wikimedia"
+2. OAuth redirect to Wikimedia
+3. User authorizes application
+4. Custom pipeline:
+   - Matches existing users by wiki handle
+   - Resolves username conflicts
+   - Creates user profile automatically
+   - Logs authentication event
+5. User redirected to home page
+
+## 🧪 Testing
 
 ```bash
-python manage.py tailwind build
+# Run all tests
+python manage.py test
+
+# Run authentication tests only
+python manage.py test users
+
+# Run with coverage
+coverage run --source='.' manage.py test
+coverage report
 ```
 
-This generates a minified CSS file optimized for production.
+## 🎨 UI Components
 
-### Collect static files
+### HTMX Features
+- Partial page updates
+- Smooth transitions
+- Progressive enhancement
+- No full page reloads
 
 ```bash
 python manage.py collectstatic
 ```
 
-## Key Configuration
+### Templates
+- `theme/templates/base.html` - Base layout with messages
+- `theme/templates/partials/sidebar.html` - Navigation
+- `users/templates/users/` - Authentication templates
 
-### Tailwind CSS
+## 🚀 Production Deployment
 
-- Configuration file: `theme/static_src/tailwind.config.js`
-- Source CSS: `theme/static_src/src/styles.css`
-- Compiled CSS: `theme/static/css/dist/styles.css`
+### Checklist
 
-### HTMX
+- [ ] Set `DEBUG=False`
+- [ ] Use strong `SECRET_KEY`
+- [ ] Configure `ALLOWED_HOSTS`
+- [ ] Enable HTTPS
+- [ ] Set secure cookie flags
+- [ ] Configure database (PostgreSQL recommended)
+- [ ] Set up log rotation
+- [ ] Monitor authentication logs
+- [ ] Build Tailwind for production: `python manage.py tailwind build`
+- [ ] Collect static files: `python manage.py collectstatic`
 
-HTMX is included via CDN in the base template. The `django-htmx` middleware provides the `request.htmx` attribute to detect HTMX requests in views:
+### Environment Variables
 
-```python
-def my_view(request):
-    if request.htmx:
-        # Return partial HTML for HTMX request
-        return render(request, 'partials/my_partial.html')
-    # Return full page for regular request
-    return render(request, 'my_page.html')
+```env
+DJANGO_DEBUG=False
+DJANGO_SECRET_KEY=<strong-random-key>
+DJANGO_ALLOWED_HOSTS=yourdomain.com
+MEDIAWIKI_OAUTH_KEY=<production-key>
+MEDIAWIKI_OAUTH_SECRET=<production-secret>
 ```
 
-## License
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `python manage.py test`
+5. Submit a pull request
+
+## 📝 License
 
 [Add your license here]
+
+## 🆘 Support
+
+- Check `logs/` directory for application logs
+- Review [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for OAuth issues
+- Check Django debug page in development
+- Review test suite for usage examples
+
+## 🎯 Next Steps
+
+After setup, you can:
+1. Customize user profile fields in `users/models.py`
+2. Add more views and features
+3. Customize the Tailwind theme in `theme/static_src/tailwind.config.js`
+4. Add more HTMX interactions
+5. Extend the authentication pipeline
+
+---
+
+Built with ❤️ for Wikimedia Colombia

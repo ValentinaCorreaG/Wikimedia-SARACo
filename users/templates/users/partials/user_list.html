@@ -1,0 +1,82 @@
+<!-- Lista de Usuarios -->
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <div class="overflow-x-auto">
+            <table class="table table-zebra">
+                <thead>
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Usuario</th>
+                        <th>Nombre</th>
+                        <th>Usuario Wiki</th>
+                        <th>Posición</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr class="hover">
+                            <td>
+                                <div class="avatar placeholder">
+                                    <div class="bg-primary text-primary-content rounded-full w-12 h-12">
+                                        {% if user.profile.photograph %}
+                                            <img src="{{ user.profile.photograph }}" alt="{{ user.username }}" />
+                                        {% else %}
+                                            <span class="text-xl">{{ user.username|first|upper }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="font-bold">{{ user.username }}</div>
+                                <div class="text-sm opacity-50">{{ user.email|default:"Sin correo" }}</div>
+                            </td>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td>
+                                {% if user.profile.professional_wiki_handle %}
+                                    <span class="badge badge-primary badge-sm">
+                                        {{ user.profile.professional_wiki_handle }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-base-content/50">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.profile.position %}
+                                    {{ user.profile.position }}
+                                {% else %}
+                                    <span class="text-base-content/50">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.is_superuser %}
+                                    <span class="badge badge-error">Superusuario</span>
+                                {% elif user.is_staff %}
+                                    <span class="badge badge-warning">Staff</span>
+                                {% else %}
+                                    <span class="badge badge-ghost">Usuario</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'users:profile_detail' username=user.username %}" 
+                                   class="btn btn-sm btn-ghost">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-base-content/50">
+                                No se encontraron usuarios
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

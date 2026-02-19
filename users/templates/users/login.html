@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
+    <div class="card w-full max-w-md bg-base-100 shadow-2xl">
+        <div class="card-body">
+            <!-- Logo/Header -->
+            <div class="text-center mb-6">
+                <h1 class="text-4xl font-bold text-primary mb-2">
+                    SARA
+                </h1>
+                <p class="text-base-content/70">Wikimedia Colombia</p>
+            </div>
+
+            {% if messages %}
+                <div class="space-y-2 mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} shadow-lg">
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Login Content -->
+            <div id="login-content">
+                {% include "users/partials/login_form.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

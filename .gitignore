@@ -1,40 +1,54 @@
-# Environment
-.env
-.env.*
-venv/
-.venv/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-*.egg-info/
-.eggs/
-dist/
+env/
+venv/
+ENV/
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Django
 *.log
+local_settings.py
 db.sqlite3
-media/
-staticfiles/
-*.pot
-*.mo
+db.sqlite3-journal
+/staticfiles/
+/media/
+logs/
 
-# Node.js / Tailwind
-node_modules/
-npm-debug.log
-yarn-error.log
-package-lock.json  # Optional: remove if you want to lock versions
+# Environment variables
+.env
+.env.local
 
-# IDE / Editor
-.idea/
+# IDE
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 
-# macOS
+# OS
 .DS_Store
+Thumbs.db
+
+# Node (for Tailwind)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
