@@ -117,7 +117,7 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_MEDIAWIKI_KEY = env('MEDIAWIKI_OAUTH_KEY', default='')
 SOCIAL_AUTH_MEDIAWIKI_SECRET = env('SOCIAL_AUTH_MEDIAWIKI_SECRET', default='')
 SOCIAL_AUTH_MEDIAWIKI_URL = env('MEDIAWIKI_URL', default='https://meta.wikimedia.org/w/index.php')
-SOCIAL_AUTH_MEDIAWIKI_CALLBACK = 'http://127.0.0.1:8000/oauth/complete/mediawiki/oob'
+SOCIAL_AUTH_MEDIAWIKI_CALLBACK = 'http://127.0.0.1:8000/oauth/complete/mediawiki/'
 
 # Social Auth Pipeline with custom steps
 SOCIAL_AUTH_PIPELINE = (

@@ -72,7 +72,7 @@ def logout_view(request):
     logout(request)
     logger.info(f"User logged out: {username}")
     messages.success(request, _("You have been logged out successfully."))
-    return redirect('home')
+    return redirect('base')
 
 
 @login_required
