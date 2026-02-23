@@ -13,16 +13,6 @@
                 <p class="text-base-content/70">Wikimedia Colombia</p>
             </div>
 
-            {% if messages %}
-                <div class="space-y-2 mb-4">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags|default:'info' }} shadow-lg">
-                            <span>{{ message }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
             <!-- Login Content -->
             <div id="login-content">
                 {% include "users/partials/login_form.html" %}

@@ -8,7 +8,7 @@ to handle Wikimedia authentication with intelligent user matching and logging.
 import logging
 from typing import Dict, Any, Optional
 from django.contrib.auth import get_user_model
-from users.models import UserProfile
+from social_core.exceptions import AuthForbidden
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -23,16 +23,14 @@ def associate_by_wiki_handle(
 ) -> Dict[str, User]:
     """
     Authentication pipeline step that associates a login attempt with an
-    existing User based on a Wikimedia username.
+    existing User based on the same username in Django.
 
     If a user is already authenticated, it returns immediately.
-    Otherwise, it attempts to match the external username against:
-    1. UserProfile.professional_wiki_handle (case-insensitive)
-    2. User.username (fallback)
+    Otherwise, it attempts to match the external username against
+    User.username.
 
-    This prevents duplicate accounts and allows users to authenticate
-    using their Wikimedia username even if their Django username differs
-    (backward compatibility, from when the login was not made with OAuth)
+    If no matching user exists, authentication is rejected and account
+    creation is not allowed from OAuth.
 
     Args:
         backend: Authentication backend in use.
@@ -43,7 +41,7 @@ def associate_by_wiki_handle(
                   a 'details' dict containing a 'username' key.
 
     Returns:
-        dict: {'user': User} if a matching user is found, otherwise an empty dict.
+        dict: {'user': User} if a matching user is found.
     """
     if user:
         logger.info(f"User already authenticated: {user.username}")
@@ -52,31 +50,17 @@ def associate_by_wiki_handle(
     details = kwargs.get('details', {})
     wiki_username = details.get('username')
 
-    if wiki_username:
-        # Try to match by professional wiki handle
-        profile = UserProfile.objects.filter(
-            professional_wiki_handle__iexact=wiki_username
-        ).select_related('user').first()
-        
-        if profile:
-            logger.info(
-                f"User matched by wiki handle: {wiki_username} -> {profile.user.username}"
-            )
-            return {'user': profile.user}
-
-        # Fallback to username matching
-        user_ = User.objects.filter(username=wiki_username).first()
-        if user_:
-            logger.info(
-                f"User matched by username: {wiki_username}"
-            )
-            return {'user': user_}
-        
-        logger.info(f"New user will be created: {wiki_username}")
-    else:
+    if not wiki_username:
         logger.warning("No wiki username provided in authentication details")
+        raise AuthForbidden(backend, "A Wikimedia username is required")
 
-    return {}
+    user_ = User.objects.filter(username=wiki_username).first()
+    if user_:
+        logger.info(f"User matched by username: {wiki_username}")
+        return {'user': user_}
+
+    logger.warning(f"OAuth login rejected (user not found): {wiki_username}")
+    raise AuthForbidden(backend, "User is not authorized for this application")
 
 
 def get_username(

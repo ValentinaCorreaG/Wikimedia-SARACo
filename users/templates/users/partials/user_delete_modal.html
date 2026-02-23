@@ -1,0 +1,30 @@
+<dialog id="delete_user_modal" class="modal">
+    <div class="modal-box">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Cerrar">✕</button>
+        </form>
+        <h3 class="font-bold text-lg mb-4">Confirmar eliminación</h3>
+        <p class="py-4">
+            ¿Estás seguro de que deseas eliminar al usuario <strong id="delete-username"></strong>?
+        </p>
+        <p class="text-sm text-base-content/60 mb-4">
+            Esta acción no se puede deshacer.
+        </p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-ghost">Cancelar</button>
+            </form>
+            <button id="confirm-delete-btn"
+                    class="btn btn-error"
+                    hx-delete=""
+                    hx-target="#user-list-content"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="delete_user_modal.close()">
+                Eliminar
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar modal">close</button>
+    </form>
+</dialog>

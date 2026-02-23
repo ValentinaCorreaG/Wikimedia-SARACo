@@ -10,6 +10,7 @@ from django.urls import reverse
 from users.models import UserProfile, TeamArea, Position
 from users.pipeline import associate_by_wiki_handle, get_username
 from django.contrib.auth.models import Group
+from social_core.exceptions import AuthForbidden
 
 User = get_user_model()
 
@@ -48,12 +49,12 @@ class AuthenticationPipelineTest(TestCase):
         self.user.profile.save()
 
     def test_associate_by_wiki_handle_existing_user(self):
-        """Test matching existing users by wiki handle (case-insensitive)."""
+        """Test matching existing users by username."""
         result = associate_by_wiki_handle(
             backend=None,
             uid='12345',
             user=None,
-            details={'username': 'existingwikiuser'}  # lowercase
+            details={'username': 'existing_user'}
         )
         
         self.assertIn('user', result)
@@ -72,15 +73,14 @@ class AuthenticationPipelineTest(TestCase):
         self.assertEqual(result['user'], self.user)
 
     def test_associate_by_wiki_handle_no_match(self):
-        """Test when no user matches."""
-        result = associate_by_wiki_handle(
-            backend=None,
-            uid='12345',
-            user=None,
-            details={'username': 'nonexistent_user'}
-        )
-        
-        self.assertEqual(result, {})
+        """Test when no user matches raises AuthForbidden."""
+        with self.assertRaises(AuthForbidden):
+            associate_by_wiki_handle(
+                backend=None,
+                uid='12345',
+                user=None,
+                details={'username': 'nonexistent_user'}
+            )
 
     def test_associate_by_wiki_handle_already_authenticated(self):
         """Test when user is already authenticated."""
@@ -224,6 +224,51 @@ class AuthenticationViewsTest(TestCase):
         response = self.client.get(reverse('users:user_list'))
         
         self.assertEqual(response.status_code, 200)
+
+    def test_superuser_can_create_staff_user_from_user_list(self):
+        """Test superusers can create staff users from the user list view."""
+        superuser = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123'
+        )
+        self.client.login(username='admin', password='adminpass123')
+
+        response = self.client.post(reverse('users:user_list'), {
+            'username': 'newstaff',
+            'email': 'newstaff@example.com',
+            'first_name': 'New',
+            'last_name': 'Staff',
+            'password1': 'safePass123',
+            'password2': 'safePass123',
+            'role': 'staff',
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(User.objects.filter(username='newstaff').exists())
+        created_user = User.objects.get(username='newstaff')
+        self.assertTrue(created_user.is_staff)
+        self.assertFalse(created_user.is_superuser)
+
+    def test_non_superuser_cannot_create_user_from_user_list(self):
+        """Test non-superusers cannot create users from the user list view."""
+        self.user.is_staff = True
+        self.user.save()
+
+        from django.contrib.auth.models import Permission
+        permission = Permission.objects.get(codename='view_user')
+        self.user.user_permissions.add(permission)
+
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(reverse('users:user_list'), {
+            'username': 'blocked',
+            'password1': 'safePass123',
+            'password2': 'safePass123',
+            'role': 'staff',
+        })
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.filter(username='blocked').exists())
 
 
 class HTMXViewsTest(TestCase):

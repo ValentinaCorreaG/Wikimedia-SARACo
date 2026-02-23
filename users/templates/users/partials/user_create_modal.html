@@ -1,0 +1,12 @@
+<dialog id="create_user_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Cerrar">✕</button>
+        </form>
+        <h3 class="font-bold text-lg mb-4">Crear usuario</h3>
+        {% include "users/partials/user_create_form.html" %}
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar modal">close</button>
+    </form>
+</dialog>

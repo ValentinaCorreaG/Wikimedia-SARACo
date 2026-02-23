@@ -4,6 +4,7 @@ Core app views.
 Handles the calendar view, event list, and CRUD operations for events.
 Supports both full-page and HTMX partial responses.
 """
+import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -120,7 +121,13 @@ def create_event(request):
 
             if request.htmx:
                 response = HttpResponse(status=204)
-                response['HX-Trigger'] = 'eventClosed'
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
                 return response
             return redirect('event_list')
     else:
@@ -148,7 +155,13 @@ def edit_event(request, pk):
             if request.htmx:
                 events = Event.objects.all().order_by('start_date')
                 response = render(request, 'calendar/partials/event_list.html', {'events': events})
-                response['HX-Trigger'] = 'eventClosed'
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
                 return response
             return redirect('event_list')
     else:
@@ -176,7 +189,13 @@ def delete_event(request, pk):
         if request.htmx:
             events = Event.objects.all().order_by('start_date')
             response = render(request, 'calendar/partials/event_list.html', {'events': events})
-            response['HX-Trigger'] = 'eventClosed'
+            response['HX-Trigger'] = json.dumps({
+                'modalClose': {
+                    'modalId': 'modal-container',
+                    'contentId': 'modal-box-content',
+                    'reload': True
+                }
+            })
             return response
         return redirect('event_list')
 

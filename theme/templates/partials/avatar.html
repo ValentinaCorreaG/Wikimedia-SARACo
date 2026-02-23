@@ -1,0 +1,9 @@
+<div class="avatar placeholder  {{ extra_classes }}">
+    <div class="bg-support-community text-primary-content rounded-full {{ size|default:'w-12 h-12' }}">
+        {% if avatar_user.profile.photograph %}
+            <img src="{{ avatar_user.profile.photograph }}" alt="{{ avatar_user.username }}" />
+        {% else %}
+            <span class="{{ text_size|default:'text-xl' }}">{{ avatar_user.username|first|upper }}</span>
+        {% endif %}
+    </div>
+</div>

@@ -125,9 +125,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
-    'users.pipeline.associate_by_wiki_handle',  # Custom: Match existing users
-    'users.pipeline.get_username',  # Custom: Handle username conflicts
-    'social_core.pipeline.user.create_user',
+    'users.pipeline.associate_by_wiki_handle',  # Custom: Match only pre-created users
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',

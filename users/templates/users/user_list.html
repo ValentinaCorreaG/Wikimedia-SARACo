@@ -6,17 +6,23 @@
     <!-- Encabezado -->
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold">Usuarios</h1>
-        <div class="breadcrumbs text-sm">
-            <ul>
-                <li><a href="{% url 'home' %}">Inicio</a></li>
-                <li>Usuarios</li>
-            </ul>
+        <div class="flex items-center gap-3">
+            {% if request.user.is_superuser %}
+                <button type="button" class="btn btn-primary" onclick="create_user_modal.showModal()">
+                    Crear Usuario
+                </button>
+            {% endif %}
         </div>
     </div>
 
     <!-- Contenido de Lista de Usuarios -->
     <div id="user-list-content">
-        {% include "users/partials/user_list.html" %}
+        {% include "users/partials/user_table.html" %}
     </div>
 </div>
+
+{% if request.user.is_superuser %}
+{% include "users/partials/user_create_modal.html" %}
+{% include "users/partials/user_delete_modal.html" %}
+{% endif %}
 {% endblock %}

@@ -13,20 +13,6 @@
             <p class="text-sm sm:text-base text-base-content opacity-70">Gestiona todos tus eventos en un solo lugar</p>
         </div>
 
-        <!-- Flash messages -->
-        {% if messages %}
-        <div id="messages" class="mb-6 space-y-2">
-            {% for message in messages %}
-            <div class="alert alert-info shadow-lg animate-fade-in">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>{{ message }}</span>
-        </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <!-- Calendar vs list view navigation -->
         <div class="mb-6 flex gap-3">
             <a href="{% url 'calendar' %}" 
@@ -106,7 +92,7 @@
         <form method="dialog" class="absolute right-2 top-2">
             <button type="submit" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar">✕</button>
         </form>
-        <div id="modal-box-content">
+        <div id="modal-box-content" data-modal-target="modal-container">
             <!-- HTMX swaps content here -->
         </div>
     </div>
@@ -115,5 +101,4 @@
     </form>
 </dialog>
 
-<script src="{% static 'js/event-list.js' %}"></script>
 {% endblock %}
