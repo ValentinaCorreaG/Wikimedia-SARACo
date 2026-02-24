@@ -1,0 +1,40 @@
+<div id="user-form-container">
+    <form id="create-user-form" method="post" action="{% url 'users:user_list' %}" class="space-y-3"
+          hx-post="{% url 'users:user_list' %}"
+          hx-target="#user-form-container"
+          hx-swap="outerHTML">
+        {% csrf_token %}
+        <div>
+            <label class="label" for="{{ create_user_form.username.id_for_label }}"><span class="label-text">Usuario de Wikimedia</span></label>
+            {{ create_user_form.username }}
+            <p class="text-base-content/60 text-xs mt-1">Debe coincidir exactamente con el nombre de usuario en Wikimedia/Wikipedia</p>
+            {% if create_user_form.username.errors %}<p class="text-error text-sm mt-1">{{ create_user_form.username.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="label" for="{{ create_user_form.email.id_for_label }}"><span class="label-text">Correo Electrónico</span></label>
+            {{ create_user_form.email }}
+            {% if create_user_form.email.errors %}<p class="text-error text-sm mt-1">{{ create_user_form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label class="label" for="{{ create_user_form.first_name.id_for_label }}"><span class="label-text">Nombre</span></label>
+                {{ create_user_form.first_name }}
+            </div>
+            <div>
+                <label class="label" for="{{ create_user_form.last_name.id_for_label }}"><span class="label-text">Apellido</span></label>
+                {{ create_user_form.last_name }}
+            </div>
+        </div>
+        <div>
+            <label class="label" for="{{ create_user_form.role.id_for_label }}"><span class="label-text">Rol</span></label>
+            {{ create_user_form.role }}
+            {% if create_user_form.role.errors %}<p class="text-error text-sm mt-1">{{ create_user_form.role.errors.0 }}</p>{% endif %}
+        </div>
+    </form>
+    <div class="modal-action mt-4">
+        <button type="submit" form="create-user-form" class="btn btn-primary">Crear</button>
+        <form method="dialog">
+            <button class="btn">Cerrar</button>
+        </form>
+    </div>
+</div>
