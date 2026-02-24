@@ -16,7 +16,7 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import gettext as _
 from django.contrib.auth import get_user_model
-from users.forms import UserCreationByRoleForm
+from users.forms import UserCreationByRoleForm, ProfileEditForm
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -101,14 +101,75 @@ def profile_view(request, username=None):
         user = request.user
     
     can_edit = request.user == user or request.user.is_staff
+    form = ProfileEditForm(instance=user.profile, user=user) if can_edit else None
     
     context = {
         'profile_user': user,
         'can_edit': can_edit,
+        'form': form,
     }
     
     template = 'users/partials/profile_detail.html' if request.htmx else 'users/profile.html'
     return render(request, template, context)
+
+
+@login_required
+def profile_edit_view(request):
+    """
+    Edit the current user's profile.
+    
+    Supports HTMX for modal form submissions.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        Rendered profile edit form or redirect.
+    """
+    user = request.user
+    profile = user.profile
+    
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, instance=profile, user=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Profile updated successfully."))
+            
+            if request.htmx:
+                context = {
+                    'profile_user': user,
+                    'can_edit': True,
+                }
+                response = render(request, 'users/partials/profile_detail.html', context)
+                response['HX-Retarget'] = '#profile-content'
+                response['HX-Reswap'] = 'innerHTML'
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'edit_profile_modal'
+                    }
+                })
+                return response
+            return redirect('users:profile')
+        else:
+            if request.htmx:
+                response = render(request, 'users/partials/profile_edit_form.html', {'form': form})
+                response['HX-Trigger'] = json.dumps({
+                    'formInvalid': {
+                        'modalId': 'edit_profile_modal'
+                    }
+                })
+                return response
+    else:
+        form = ProfileEditForm(instance=profile, user=user)
+    
+    if request.htmx:
+        return render(request, 'users/partials/profile_edit_form.html', {'form': form})
+    
+    return render(request, 'users/profile.html', {
+        'profile_user': user,
+        'can_edit': True,
+        'form': form,
+    })
 
 
 @login_required

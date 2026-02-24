@@ -1,0 +1,105 @@
+<div id="profile-edit-form-container">
+    <form id="profile-edit-form" method="post" 
+          action="{% url 'users:profile_edit' %}" 
+          class="space-y-4"
+          hx-post="{% url 'users:profile_edit' %}"
+          hx-target="#profile-edit-form-container"
+          hx-swap="outerHTML">
+        <!-- {% csrf_token %} -->
+        
+        <!-- Personal Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="label" for="{{ form.first_name.id_for_label }}">
+                    <span class="label-text">Nombre</span>
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <p class="text-error text-sm mt-1">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="label" for="{{ form.last_name.id_for_label }}">
+                    <span class="label-text">Apellido</span>
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <p class="text-error text-sm mt-1">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="label" for="{{ form.email.id_for_label }}">
+                    <span class="label-text">Correo Electrónico</span>
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <p class="text-error text-sm mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="label" for="{{ form.gender.id_for_label }}">
+                    <span class="label-text">Género</span>
+                </label>
+                {{ form.gender }}
+                {% if form.gender.errors %}
+                    <p class="text-error text-sm mt-1">{{ form.gender.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Social Media -->
+        <div class="divider">Redes Sociales</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="label" for="{{ form.twitter.id_for_label }}">
+                    <span class="label-text">Twitter</span>
+                </label>
+                {{ form.twitter }}
+            </div>
+            <div>
+                <label class="label" for="{{ form.facebook.id_for_label }}">
+                    <span class="label-text">Facebook</span>
+                </label>
+                {{ form.facebook }}
+            </div>
+            <div>
+                <label class="label" for="{{ form.instagram.id_for_label }}">
+                    <span class="label-text">Instagram</span>
+                </label>
+                {{ form.instagram }}
+            </div>
+        </div>
+
+        <!-- Academic -->
+        <div class="divider">Académico y Profesional</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="label" for="{{ form.linkedin.id_for_label }}">
+                    <span class="label-text">LinkedIn</span>
+                </label>
+                {{ form.linkedin }}
+            </div>
+            <div>
+                <label class="label" for="{{ form.wikidata_item.id_for_label }}">
+                    <span class="label-text">Wikidata</span>
+                </label>
+                {{ form.wikidata_item }}
+            </div>
+            <div>
+                <label class="label" for="{{ form.orcid.id_for_label }}">
+                    <span class="label-text">ORCID</span>
+                </label>
+                {{ form.orcid }}
+            </div>
+        </div>
+    </form>
+    <div class="modal-action mt-6">
+        <button type="submit" form="profile-edit-form" class="btn btn-primary">Guardar</button>
+        <form method="dialog">
+            <button class="btn btn-ghost">Cancelar</button>
+        </form>
+    </div>
+</div>

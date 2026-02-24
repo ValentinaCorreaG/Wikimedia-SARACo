@@ -13,6 +13,7 @@ urlpatterns = [
     
     # Profile management
     path("profile/", views.profile_view, name="profile"),
+    path("profile/edit/", views.profile_edit_view, name="profile_edit"),
     path("profile/<str:username>/", views.profile_view, name="profile_detail"),
     path("list/", views.user_list_view, name="user_list"),
     path("<int:user_id>/delete/", views.user_delete_view, name="user_delete"),
