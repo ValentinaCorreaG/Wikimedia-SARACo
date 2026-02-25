@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from wikimediacolombiasara.views import some_view
-
+from . import views
 urlpatterns = [
     path('', some_view, name='home'), 
     path('admin/', admin.site.urls),
@@ -36,4 +36,7 @@ urlpatterns = [
     path('events/<int:pk>/', core_views.event_detail, name='event_detail'),
     path('events/<int:pk>/edit/', core_views.edit_event, name='edit_event'),
     path('events/<int:pk>/delete/', core_views.delete_event, name='delete_event'),
+    path('', views.index, name='index'),
+    path('/outreach/stats/', views.outreach_stats_api, name='outreach_stats'),
+    path('/outreach/refresh/', views.outreach_refresh_api, name='outreach_refresh'),
 ]

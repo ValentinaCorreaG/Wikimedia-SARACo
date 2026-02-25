@@ -6,14 +6,15 @@ Supports both full-page and HTMX partial responses.
 """
 import json
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.db.models import Q
+from .services import OutreachService
+import logging
 from datetime import datetime, timedelta
 from calendar import monthrange
 from .models import Event
 from .forms import EventForm
-
 
 def base(request):
     """Render the home page."""
@@ -210,3 +211,38 @@ def event_detail(request, pk):
     if request.htmx:
         return render(request, 'calendar/partials/event_detail.html', {'event': event})
     return render(request, 'calendar/partials/event_detail.html', {'event': event})
+
+
+
+from django.shortcuts import render
+from outreach_service import OutreachService
+
+def index(request):
+    """Página principal con estadísticas de Outreach Dashboard"""
+    
+    # Obtener estadísticas de Outreach
+    outreach_service = OutreachService()
+    outreach_stats = outreach_service.get_stats()
+    
+    # Estadísticas locales (sin BD por ahora)
+    local_stats = {
+        'activities': 0,
+        'programs': 2,
+        'cities': 0
+    }
+    
+    context = {
+        'outreach_stats': outreach_stats,
+        'local_stats': local_stats,
+        'page_title': 'Inicio'
+    }
+    
+    return render(request, 'core/index.html', context)
+
+def about(request):
+    """Página sobre Wikimedia Colombia"""
+    context = {
+        'page_title': 'Sobre Nosotros'
+    }
+    return render(request, 'core/about.html', context)
+
