@@ -13,11 +13,13 @@ from datetime import datetime, timedelta
 from calendar import monthrange
 from .models import Event
 from .forms import EventForm
+from .services import OutreachMetricsService
 
 
 def base(request):
     """Render the home page."""
-    return render(request, 'base.html')
+    outreach_metrics = OutreachMetricsService().fetch_metrics()
+    return render(request, 'base.html', {'outreach_metrics': outreach_metrics})
 
 
 def calendar_view(request):
