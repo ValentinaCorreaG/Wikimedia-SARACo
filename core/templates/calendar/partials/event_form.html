@@ -1,16 +1,4 @@
 <!-- Event create/edit form partial: content for DaisyUI modal-box -->
-
-<div class="flex justify-between items-center mb-4">
-    <h3 class="font-bold text-lg">{{ title }}</h3>
-    <form method="dialog">
-        <button type="submit" class="btn btn-ghost btn-sm btn-circle" aria-label="Cerrar">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-    </form>
-</div>
-
 <form id="event-form"
       {% if event %}hx-post="{% url 'edit_event' event.pk %}"{% else %}hx-post="{% url 'create_event' %}"{% endif %}
       hx-target="#modal-box-content"
@@ -73,6 +61,27 @@
             {{ form.responsible_area }}
             {% if form.responsible_area.errors %}
             <p class="text-sm text-error mt-1">{{ form.responsible_area.errors.0 }}</p>
+            {% endif %}
+        </div>
+        <div class="form-control">
+            <label class="label" for="{{ form.activity_type.id_for_label }}">
+                <span class="label-text font-semibold">Tipo de Actividad</span>
+            </label>
+            {{ form.activity_type }}
+            {% if form.activity_type.errors %}
+            <p class="text-sm text-error mt-1">{{ form.activity_type.errors.0 }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.location.id_for_label }}">
+                <span class="label-text font-semibold">Ubicación</span>
+            </label>
+            {{ form.location }}
+            {% if form.location.errors %}
+            <p class="text-sm text-error mt-1">{{ form.location.errors.0 }}</p>
             {% endif %}
         </div>
         <div class="form-control">
