@@ -1,6 +1,14 @@
 from .models import Event, Project, Activity
 from django import forms
 from django.utils import timezone
+from .models import Event, Attendance
+
+# Base CSS classes for form inputs
+BASE_INPUT_CLASS = (
+    "w-full px-4 py-2 border border-primary-200 rounded-lg "
+    "focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+)
+
 from .models import Event, Project
 
 class ActivityForm(forms.ModelForm):
@@ -87,33 +95,41 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = [
-            'name', 'start_date', 'end_date',
-            'responsible_area', 'expected_participants', 'description'
-        ]
+        fields = ['name', 'start_date', 'end_date', 'responsible_area', 'activity_type', 'location', 'expected_participants', 'description']
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'w-full input input-bordered',
+                'class': BASE_INPUT_CLASS,
                 'placeholder': 'Ej: Reunión mensual'
             }),
             'start_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full input input-bordered'
+                'class': BASE_INPUT_CLASS,
             }),
             'end_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full input input-bordered'
+                'class': BASE_INPUT_CLASS,
             }),
             'responsible_area': forms.Select(choices=AREA_CHOICES, attrs={
-                'class': 'w-full select select-bordered'
+                'class': BASE_INPUT_CLASS,
+                'id': 'responsible_area'
+            }),
+            'activity_type': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Tipo de actividad'
+            }),
+            'location': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Ubicación de el evento'
             }),
             'expected_participants': forms.NumberInput(attrs={
-                'class': 'w-full input input-bordered',
-                'min': '1'
+                'class': BASE_INPUT_CLASS,
+                'min': '1',
+                'placeholder': 'Número de participantes'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'w-full textarea textarea-bordered',
-                'rows': 4
+                'class': BASE_INPUT_CLASS,
+                'rows': 4,
+                'placeholder': 'Descripción del evento (opcional)'
             }),
         }
 
@@ -133,6 +149,122 @@ class EventForm(forms.ModelForm):
                 'La fecha de fin debe ser igual o posterior a la fecha de inicio.'
             )
         return cleaned_data
+
+
+class AttendanceForm(forms.ModelForm):
+    """Form for registering attendance to an event."""
+
+    class Meta:
+        model = Attendance
+        fields = ['name', 'email', 'wiki_username', 'department', 'attendance_mode', 'satisfaction', 'comments']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Tu nombre completo'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'tu@correo.com'
+            }),
+            'wiki_username': forms.TextInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Tu usuario de Wikipedia (opcional)'
+            }),
+            'department': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+            }),
+            'attendance_mode': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+            }),
+            'satisfaction': forms.NumberInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'min': '1',
+                'max': '5',
+                'placeholder': 'Califica de 1 a 5'
+            }),
+            'comments': forms.Textarea(attrs={
+                'class': BASE_INPUT_CLASS,
+                'rows': 4,
+                'placeholder': 'Comentarios o sugerencias (opcional)'
+            }),
+        }
+
+
+class ProjectForm(forms.ModelForm):
+    """Form for creating and editing projects."""
+
+    class Meta:
+        model = Project
+        fields = [
+            'name', 'program', 'start_date',
+            'end_date', 'status', 'responsible', 'description'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'w-full input input-bordered',
+                'placeholder': 'Nombre del proyecto'
+            }),
+            'program': forms.Select(attrs={
+                'class': 'w-full select select-bordered'
+            }),
+            'start_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'w-full input input-bordered'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'w-full input input-bordered'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'w-full select select-bordered'
+            }),
+            'responsible': forms.TextInput(attrs={
+                'class': 'w-full input input-bordered',
+                'placeholder': 'Responsable del proyecto'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'w-full textarea textarea-bordered',
+                'rows': 4
+            }),
+        }
+        
+class AttendanceForm(forms.ModelForm):
+    """Form for registering attendance to an event."""
+
+    class Meta:
+        model = Attendance
+        fields = ['name', 'email', 'wiki_username', 'department', 'attendance_mode', 'satisfaction', 'comments']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Tu nombre completo'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'tu@correo.com'
+            }),
+            'wiki_username': forms.TextInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'placeholder': 'Tu usuario de Wikipedia (opcional)'
+            }),
+            'department': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+            }),
+            'attendance_mode': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+            }),
+            'satisfaction': forms.NumberInput(attrs={
+                'class': BASE_INPUT_CLASS,
+                'min': '1',
+                'max': '5',
+                'placeholder': 'Califica de 1 a 5'
+            }),
+            'comments': forms.Textarea(attrs={
+                'class': BASE_INPUT_CLASS,
+                'rows': 4,
+                'placeholder': 'Comentarios o sugerencias (opcional)'
+            }),
+        }
 
 class ProjectForm(forms.ModelForm):
     """Form for creating and editing projects."""

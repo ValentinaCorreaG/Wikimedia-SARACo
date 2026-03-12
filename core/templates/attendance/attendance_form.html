@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de asistencia - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-base-100 shadow-lg rounded-xl p-8 mt-6">
+        <h1 class="text-2xl font-bold mb-2">Registro de asistencia</h1>
+        <p class="text-sm text-base-content/70 mb-6">
+            Evento: <span class="font-semibold">{{ event.name }}</span><br>
+            Fecha: {{ event.start_date }}{% if event.start_date != event.end_date %} - {{ event.end_date }}{% endif %}
+        </p>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="text-error">*</span>
+                        {% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <p class="text-xs text-error mt-1">
+                            {{ field.errors|striptags }}
+                        </p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="pt-4">
+                <button type="submit" class="btn btn-primary w-full">
+                    Enviar registro
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

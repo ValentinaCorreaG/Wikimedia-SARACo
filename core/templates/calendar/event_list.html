@@ -23,7 +23,7 @@
                 Vista Calendario
             </a>
             <a href="{% url 'event_list' %}" 
-               class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg ring-2 ring-blue-300">
+               class="btn btn-primary">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                 </svg>
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Main content card -->
-        <div class="card bg-base-100 shadow-lg sm:shadow-xl p-4 sm:p-5 md:p-6">
+        <div class="card p-4 sm:p-5 md:p-6">
             
             <!-- Search input, area filter, and create-event button -->
             <div class="mb-5 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
@@ -66,8 +66,8 @@
                         </option>
                     </select>
                 </div>
-                
-                <button class="w-full sm:w-auto px-4 sm:px-6 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary-focus transition-colors shadow-md hover:shadow-lg font-medium whitespace-nowrap"
+                {% if user.is_authenticated %} 
+                <button class="btn btn-primary"
                         hx-get="{% url 'create_event' %}"
                         hx-target="#modal-box-content"
                         hx-swap="innerHTML">
@@ -76,6 +76,7 @@
                     </svg>
                     Crear Evento
                 </button>
+                {% endif %}
             </div>
 
             <!-- Event list (HTMX swaps this area) -->
