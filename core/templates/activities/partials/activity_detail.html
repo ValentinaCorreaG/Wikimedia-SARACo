@@ -1,0 +1,21 @@
+<div class="p-4 relative">
+    <button type="button" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold" onclick="window.history.back()" title="Cerrar">&times;</button>
+    <h2 class="text-xl font-bold mb-2">{{ activity.nombre }}</h2>
+    <p><strong>Proyecto:</strong> {{ activity.proyecto }}</p>
+    <p><strong>Fecha:</strong> {{ activity.fecha }}</p>
+    <p><strong>Descripción:</strong> {{ activity.descripcion }}</p>
+    <hr class="my-2">
+    <h3 class="font-semibold">Métricas</h3>
+    <ul class="list-disc ml-6">
+        <li><strong>Participantes:</strong> {{ activity.participantes }}<br><small>{{ activity.participantes_verificacion }}</small></li>
+        <li><strong>Personas alcanzadas indirectamente:</strong> {{ activity.personas_alcanzadas }}<br><small>{{ activity.personas_alcanzadas_verificacion }}</small></li>
+        <li><strong>Contenidos creados:</strong> {{ activity.contenidos_creados }}<br><small>{{ activity.contenidos_creados_verificacion }}</small></li>
+        <li><strong>Recursos educativos abiertos:</strong> {{ activity.recursos_educativos_abiertos }}<br><small>{{ activity.recursos_educativos_abiertos_verificacion }}</small></li>
+        <li><strong>Productos:</strong> {{ activity.productos }}<br><small>{{ activity.productos_verificacion }}</small></li>
+        <li><strong>Instituciones participantes:</strong> {{ activity.instituciones_participantes }}<br><small>{{ activity.instituciones_participantes_verificacion }}</small></li>
+        <li><strong>Alianzas estratégicas:</strong> {{ activity.alianzas_estrategicas }}<br><small>{{ activity.alianzas_estrategicas_verificacion }}</small></li>
+        <li><strong>Historias sobre soluciones y desafíos:</strong> {{ activity.historias }}<br><small>{{ activity.historias_verificacion }}</small></li>
+        <li><strong>Sostenibilidad:</strong> {{ activity.sostenibilidad }}<br><small>{{ activity.sostenibilidad_verificacion }}</small></li>
+        <li><strong>Número total de editores:</strong> {{ activity.numero_editores }}<br><small>{{ activity.numero_editores_verificacion }}</small></li>
+    </ul>
+</div>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-10">
+
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Gestor de Proyectos</h1>
+
+        <button class="btn btn-primary"
+                hx-get="{% url 'project_create' %}"
+                hx-target="#modal-box-content"
+                hx-trigger="click"
+                onclick="document.getElementById('modal-container').showModal()">
+            + Nuevo Proyecto
+        </button>
+    </div>
+
+    <div id="project-list">
+        {% include "projects/partials/project_list.html" %}
+    </div>
+
+</div>
+{% endblock %}

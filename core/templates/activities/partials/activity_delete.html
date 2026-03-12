@@ -1,0 +1,9 @@
+<form method="post" hx-post="{% url 'delete_activity' activity.pk %}" hx-target="#modal-box-content" hx-swap="innerHTML">
+    {% csrf_token %}
+    <h2 class="text-xl font-bold mb-2">Eliminar Actividad</h2>
+    <p>¿Estás seguro de que deseas eliminar la actividad <strong>{{ activity.nombre }}</strong>?</p>
+    <div class="mt-4 flex justify-end gap-2">
+        <button type="submit" class="btn btn-error">Eliminar</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancelar</button>
+    </div>
+</form>

@@ -19,7 +19,7 @@
         <!-- Page content -->
         <div class="drawer-content flex flex-col">
             <!-- Top bar (visible on mobile to toggle sidebar) -->
-            <div class="navbar bg-base-200 lg:hidden">
+            <div class="navbar bg-base-20 lg:hidden">
                 <label for="sidebar-drawer" class="btn btn-ghost btn-square drawer-button">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -58,6 +58,12 @@
     <script src="{% static 'js/utils.js' %}"></script>
     <script src="{% static 'js/modal.js' %}"></script>
     
+    <dialog id="modal-container" class="modal">
+    <div class="modal-box max-w-2xl"
+         id="modal-box-content"
+         data-modal-target="modal-container">
+    </div>
+    </dialog>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

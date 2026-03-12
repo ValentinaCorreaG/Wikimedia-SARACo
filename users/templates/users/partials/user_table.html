@@ -16,7 +16,7 @@
                 </thead>
                 <tbody>
                     {% for user in users %}
-                        <tr class="hover">
+                        <tr class="hover h-16">
                             <td>
                                 {% include "partials/avatar.html" with avatar_user=user %}
                             </td>
@@ -52,24 +52,19 @@
                             </td>
                             <td>
                                 <div class="flex gap-1">
-                                    <a href="{% url 'users:profile_detail' username=user.username %}" 
-                                       class="btn btn-sm btn-ghost cursor-pointer"
+                                    <a href="{% url 'users:profile_detail' username=user.username %}"
+                                       class="btn btn-xs btn-outline"
                                        aria-label="Ver perfil de {{ user.username }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
+                                        Ver
                                     </a>
                                     {% if request.user.is_superuser and user != request.user %}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-ghost text-error cursor-pointer"
+                                    <button type="button"
+                                            class="btn btn-xs btn-error btn-outline"
                                             aria-label="Eliminar usuario {{ user.username }}"
                                             data-username="{{ user.username }}"
                                             data-delete-url="{% url 'users:user_delete' user_id=user.id %}"
                                             onclick="showDeleteModal(this)">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
+                                        Eliminar
                                     </button>
                                     {% endif %}
                                 </div>

@@ -1,0 +1,131 @@
+<form method="post" hx-post="{{ form_action }}" hx-target="#modal-box-content" hx-swap="innerHTML">
+    {% csrf_token %}
+    <h2 class="text-xl font-bold mb-2">{{ title }}</h2>
+    {{ form.non_field_errors }}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            {{ form.proyecto.label_tag }}
+            {{ form.proyecto }}
+            {{ form.proyecto.errors }}
+        </div>
+        <div>
+            {{ form.nombre.label_tag }}
+            {{ form.nombre }}
+            {{ form.nombre.errors }}
+        </div>
+        <div>
+            {{ form.fecha.label_tag }}
+            {{ form.fecha }}
+            {{ form.fecha.errors }}
+        </div>
+        <div>
+            {{ form.descripcion.label_tag }}
+            {{ form.descripcion }}
+            {{ form.descripcion.errors }}
+        </div>
+        <div>
+            {{ form.participantes.label_tag }}
+            {{ form.participantes }}
+            {{ form.participantes.errors }}
+        </div>
+        <div>
+            {{ form.participantes_verificacion.label_tag }}
+            {{ form.participantes_verificacion }}
+            {{ form.participantes_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.personas_alcanzadas.label_tag }}
+            {{ form.personas_alcanzadas }}
+            {{ form.personas_alcanzadas.errors }}
+        </div>
+        <div>
+            {{ form.personas_alcanzadas_verificacion.label_tag }}
+            {{ form.personas_alcanzadas_verificacion }}
+            {{ form.personas_alcanzadas_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.contenidos_creados.label_tag }}
+            {{ form.contenidos_creados }}
+            {{ form.contenidos_creados.errors }}
+        </div>
+        <div>
+            {{ form.contenidos_creados_verificacion.label_tag }}
+            {{ form.contenidos_creados_verificacion }}
+            {{ form.contenidos_creados_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.recursos_educativos_abiertos.label_tag }}
+            {{ form.recursos_educativos_abiertos }}
+            {{ form.recursos_educativos_abiertos.errors }}
+        </div>
+        <div>
+            {{ form.recursos_educativos_abiertos_verificacion.label_tag }}
+            {{ form.recursos_educativos_abiertos_verificacion }}
+            {{ form.recursos_educativos_abiertos_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.productos.label_tag }}
+            {{ form.productos }}
+            {{ form.productos.errors }}
+        </div>
+        <div>
+            {{ form.productos_verificacion.label_tag }}
+            {{ form.productos_verificacion }}
+            {{ form.productos_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.instituciones_participantes.label_tag }}
+            {{ form.instituciones_participantes }}
+            {{ form.instituciones_participantes.errors }}
+        </div>
+        <div>
+            {{ form.instituciones_participantes_verificacion.label_tag }}
+            {{ form.instituciones_participantes_verificacion }}
+            {{ form.instituciones_participantes_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.alianzas_estrategicas.label_tag }}
+            {{ form.alianzas_estrategicas }}
+            {{ form.alianzas_estrategicas.errors }}
+        </div>
+        <div>
+            {{ form.alianzas_estrategicas_verificacion.label_tag }}
+            {{ form.alianzas_estrategicas_verificacion }}
+            {{ form.alianzas_estrategicas_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.historias.label_tag }}
+            {{ form.historias }}
+            {{ form.historias.errors }}
+        </div>
+        <div>
+            {{ form.historias_verificacion.label_tag }}
+            {{ form.historias_verificacion }}
+            {{ form.historias_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.sostenibilidad.label_tag }}
+            {{ form.sostenibilidad }}
+            {{ form.sostenibilidad.errors }}
+        </div>
+        <div>
+            {{ form.sostenibilidad_verificacion.label_tag }}
+            {{ form.sostenibilidad_verificacion }}
+            {{ form.sostenibilidad_verificacion.errors }}
+        </div>
+        <div>
+            {{ form.numero_editores.label_tag }}
+            {{ form.numero_editores }}
+            {{ form.numero_editores.errors }}
+        </div>
+        <div>
+            {{ form.numero_editores_verificacion.label_tag }}
+            {{ form.numero_editores_verificacion }}
+            {{ form.numero_editores_verificacion.errors }}
+        </div>
+    </div>
+    <div class="mt-4 flex justify-end gap-2">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancelar</button>
+    </div>
+</form>

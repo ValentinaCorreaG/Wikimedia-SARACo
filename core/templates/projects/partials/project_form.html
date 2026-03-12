@@ -1,0 +1,50 @@
+<h3 class="font-bold text-lg mb-4">Nuevo Proyecto</h3>
+
+<form hx-post="{{ form_action }}"
+    hx-target="#project-list"
+    hx-swap="innerHTML">
+
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label">Nombre</label>
+            {{ form.name }}
+        </div>
+
+        <div class="form-control">
+            <label class="label">Programa</label>
+            {{ form.program }}
+        </div>
+
+        <div class="form-control">
+            <label class="label">Fecha inicio</label>
+            {{ form.start_date }}
+        </div>
+
+        <div class="form-control">
+            <label class="label">Fecha fin</label>
+            {{ form.end_date }}
+        </div>
+            <div class="form-control">
+                <label class="label">Estado</label>
+                {{ form.status }}
+            </div>
+            <div class="form-control">
+                <label class="label">Responsable</label>
+                {{ form.responsible }}
+            </div>
+    </div>
+
+    <div class="form-control mt-4">
+        <label class="label">Descripción</label>
+        {{ form.description }}
+    </div>
+
+    <div class="modal-action">
+        <form method="dialog">
+            <button class="btn btn-ghost">Cancelar</button>
+        </form>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+</form>

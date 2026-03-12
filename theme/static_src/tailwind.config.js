@@ -90,6 +90,8 @@ module.exports = {
                     education: "#6A1B9A",
                     culture: "#C62828",
                     technology: "#1565C0",
+                    reports: "#FF8F00",
+                    home:"#FF6B35",
                     environment: "#0277BD",
                 },
         

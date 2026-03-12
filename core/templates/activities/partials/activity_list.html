@@ -1,0 +1,51 @@
+<div class="overflow-x-auto bg-white rounded-xl shadow">
+<table class="table w-full">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Proyecto</th>
+            <th>Fecha</th>
+            <th>Participantes</th>
+            <th>Personas alcanzadas</th>
+            <th>Contenidos creados</th>
+            <th class="text-right">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for activity in activities %}
+        <tr class="hover h-16">
+            <td class="font-medium">{{ activity.nombre }}</td>
+            <td>{{ activity.proyecto }}</td>
+            <td>{{ activity.fecha }}</td>
+            <td>{{ activity.participantes }}</td>
+            <td>{{ activity.personas_alcanzadas }}</td>
+            <td>{{ activity.contenidos_creados }}</td>
+            <td class="text-right space-x-2">
+                <button class="btn btn-xs btn-outline"
+                        hx-get="{% url 'activity_detail' activity.pk %}"
+                        hx-target="#modal-box-content"
+                        onclick="document.getElementById('modal-container').showModal()">
+                    Ver
+                </button>
+                {% if user.is_superuser %}
+                <button class="btn btn-xs btn-outline"
+                        hx-get="{% url 'edit_activity' activity.pk %}"
+                        hx-target="#modal-box-content"
+                        onclick="document.getElementById('modal-container').showModal()">
+                    Editar
+                </button>
+                <button class="btn btn-xs btn-error btn-outline"
+                        hx-get="{% url 'delete_activity' activity.pk %}"
+                        hx-target="#modal-box-content"
+                        onclick="document.getElementById('modal-container').showModal()">
+                    Eliminar
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No hay actividades registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>

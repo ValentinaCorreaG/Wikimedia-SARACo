@@ -1,0 +1,59 @@
+<div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Programa</th>
+                <th>Estado</th>
+                <th>Fechas</th>
+                <th>Responsable</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr class ="hover h-16">
+                <td class="font-medium">{{ project.name }}</td>
+                <td>{{ project.get_program_display }}</td>
+                <td>
+                    <span class="badge 
+                        {% if project.status == 'active' %}badge-success
+                        {% elif project.status == 'paused' %}badge-warning
+                        {% elif project.status == 'finished' %}badge-neutral
+                        {% else %}badge-info{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                </td>
+                <td class="text-sm">
+                    {{ project.start_date|date:"d/m/Y" }} - {{ project.end_date|date:"d/m/Y" }}
+                </td>
+                <td>{{ project.responsible }}</td>
+
+                <td class="text-right space-x-2">
+                  {% if project.pk %}
+                    <button class="btn btn-xs btn-outline"
+                            hx-get="{% url 'project_edit' project.pk %}"
+                            hx-target="#modal-box-content"
+                            onclick="document.getElementById('modal-container').showModal()">
+                        Editar
+                    </button>
+
+                    <button class="btn btn-xs btn-error btn-outline"
+                            hx-get="{% url 'project_delete' project.pk %}"
+                            hx-target="#modal-box-content"
+                            onclick="document.getElementById('modal-container').showModal()">
+                        Eliminar
+                    </button>
+                  {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-10 text-base-content/60">
+                    No hay proyectos registrados aún.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
