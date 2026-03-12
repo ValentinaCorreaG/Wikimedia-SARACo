@@ -5,6 +5,7 @@ Handles the calendar view, event list, and CRUD operations for events.
 Supports both full-page and HTMX partial responses.
 """
 import json
+from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -13,7 +14,10 @@ from datetime import datetime, timedelta
 from calendar import monthrange
 from .models import Event
 from .forms import EventForm
-
+from .forms import AttendanceForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.urls import reverse
 
 def base(request):
     """Render the home page."""
@@ -110,7 +114,7 @@ def event_list(request):
         return render(request, 'calendar/partials/event_list.html', {'events': events})
     return render(request, 'calendar/event_list.html', {'events': events, 'area_choices': AREA_CHOICES})
 
-
+@login_required
 def create_event(request):
     """Create a new event. On success, redirects to event list or returns HTMX trigger."""
     if request.method == 'POST':
@@ -142,9 +146,12 @@ def create_event(request):
     return render(request, 'calendar/partials/event_form.html', {'form': form, 'title': 'Crear Evento'})
 
 
+@login_required
 def edit_event(request, pk):
     """Edit an existing event by primary key. Supports full page and HTMX."""
     event = get_object_or_404(Event, pk=pk)
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("You don't have permission to create events.")
 
     if request.method == 'POST':
         form = EventForm(request.POST, instance=event)
@@ -181,6 +188,9 @@ def delete_event(request, pk):
     """Delete an event after confirmation. Returns event list partial for HTMX or redirect."""
     event = get_object_or_404(Event, pk=pk)
 
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("You don't have permission to create events.")
+
     if request.method == 'POST':
         event_name = event.name
         event.delete()
@@ -207,6 +217,32 @@ def delete_event(request, pk):
 def event_detail(request, pk):
     """Show a single event's details. Renders partial for HTMX modal, full page otherwise."""
     event = get_object_or_404(Event, pk=pk)
+    attendance_path = reverse("register_attendance", args=[event.attendance_token])
+    attendance_url = request.build_absolute_uri(attendance_path)
+
     if request.htmx:
-        return render(request, 'calendar/partials/event_detail.html', {'event': event})
-    return render(request, 'calendar/partials/event_detail.html', {'event': event})
+        return render(request, 'calendar/partials/event_detail.html', {'event': event, 'attendance_url': attendance_url})
+    return render(request, 'calendar/partials/event_detail.html', {'event': event, 'attendance_url': attendance_url})
+
+
+def register_attendance(request, attendance_token):
+    """
+    Register attendance to an event using its public attendance token.
+    """
+    event = get_object_or_404(Event, attendance_token=attendance_token)
+
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            attendance = form.save(commit=False)
+            attendance.event = event
+            attendance.save()
+            messages.success(request, '¡Gracias por registrar tu asistencia!')
+            return redirect('register_attendance', attendance_token=attendance_token)
+    else:
+        form = AttendanceForm()
+
+    return render(request, 'attendance/attendance_form.html', {
+        'event': event,
+        'form': form,
+    })

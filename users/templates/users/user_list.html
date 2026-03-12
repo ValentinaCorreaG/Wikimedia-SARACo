@@ -9,6 +9,9 @@
         <div class="flex items-center gap-3">
             {% if request.user.is_superuser %}
                 <button type="button" class="btn btn-primary" onclick="create_user_modal.showModal()">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
                     Crear Usuario
                 </button>
             {% endif %}
