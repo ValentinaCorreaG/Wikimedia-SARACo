@@ -1,3 +1,22 @@
+"""
+Core app views.
+
+Handles the calendar view, event list, and CRUD operations for events.
+Supports both full-page and HTMX partial responses.
+"""
+import json
+from django.contrib.auth import login, messages
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse, HttpResponseForbidden
+from django.db.models import Q
+from datetime import datetime, timedelta
+from calendar import monthrange
+from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from .services import OutreachMetricsService
+from .models import Event, Project, Activity
+
 # -------------------------
 # ACTIVITY VIEWS (CRUD)
 # -------------------------
@@ -114,29 +133,6 @@ def delete_activity(request, pk):
     if request.htmx:
         return render(request, 'activities/partials/activity_delete.html', {'activity': activity})
     return render(request, 'activities/partials/activity_delete.html', {'activity': activity})
-"""
-Core app views.
-
-Handles the calendar view, event list, and CRUD operations for events.
-Supports both full-page and HTMX partial responses.
-"""
-import json
-from django.contrib.auth import login
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from django.contrib import messages
-from django.db.models import Q
-from datetime import datetime, timedelta
-from calendar import monthrange
-from .models import Event
-from .forms import EventForm
-from .forms import AttendanceForm
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from django.urls import reverse
-from .services import OutreachMetricsService
-from .models import Event, Project, Activity
-from .forms import EventForm, ProjectForm, ActivityForm
 
 
 def base(request):

@@ -8,7 +8,6 @@ import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from django.core.validators import MinValueValidator
 class Project(models.Model):
     """
     Strategic project that groups events and activities.
