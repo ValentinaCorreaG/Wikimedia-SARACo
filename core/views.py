@@ -5,12 +5,13 @@ Handles the calendar view, event list, and CRUD operations for events.
 Supports both full-page and HTMX partial responses.
 """
 import json
-from django.contrib.auth import login, messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
+from django.contrib import messages
+from django.contrib.auth import login
 from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -392,6 +393,14 @@ def project_list(request):
     return render(request, 'projects/project_list.html', {
         'projects': projects
     })
+
+def project_detail(request, pk):
+    """Show a single project's details. Renders partial for HTMX modal, full page otherwise."""
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.htmx:
+        return render(request, 'projects/partials/project_detail.html', {'project': project})
+    return render(request, 'projects/partials/project_detail.html', {'project': project})
 
 def project_create(request):
     if request.method == 'POST':

@@ -1,131 +1,288 @@
-<form method="post" hx-post="{{ form_action }}" hx-target="#modal-box-content" hx-swap="innerHTML">
+<form id="activity-form"
+      hx-post="{{ form_action }}"
+      hx-target="#modal-box-content"
+      hx-swap="innerHTML"
+      class="space-y-5">
     {% csrf_token %}
-    <h2 class="text-xl font-bold mb-2">{{ title }}</h2>
-    {{ form.non_field_errors }}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-error shadow-lg mb-4" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
         <div>
-            {{ form.proyecto.label_tag }}
-            {{ form.proyecto }}
-            {{ form.proyecto.errors }}
-        </div>
-        <div>
-            {{ form.nombre.label_tag }}
-            {{ form.nombre }}
-            {{ form.nombre.errors }}
-        </div>
-        <div>
-            {{ form.fecha.label_tag }}
-            {{ form.fecha }}
-            {{ form.fecha.errors }}
-        </div>
-        <div>
-            {{ form.descripcion.label_tag }}
-            {{ form.descripcion }}
-            {{ form.descripcion.errors }}
-        </div>
-        <div>
-            {{ form.participantes.label_tag }}
-            {{ form.participantes }}
-            {{ form.participantes.errors }}
-        </div>
-        <div>
-            {{ form.participantes_verificacion.label_tag }}
-            {{ form.participantes_verificacion }}
-            {{ form.participantes_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.personas_alcanzadas.label_tag }}
-            {{ form.personas_alcanzadas }}
-            {{ form.personas_alcanzadas.errors }}
-        </div>
-        <div>
-            {{ form.personas_alcanzadas_verificacion.label_tag }}
-            {{ form.personas_alcanzadas_verificacion }}
-            {{ form.personas_alcanzadas_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.contenidos_creados.label_tag }}
-            {{ form.contenidos_creados }}
-            {{ form.contenidos_creados.errors }}
-        </div>
-        <div>
-            {{ form.contenidos_creados_verificacion.label_tag }}
-            {{ form.contenidos_creados_verificacion }}
-            {{ form.contenidos_creados_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.recursos_educativos_abiertos.label_tag }}
-            {{ form.recursos_educativos_abiertos }}
-            {{ form.recursos_educativos_abiertos.errors }}
-        </div>
-        <div>
-            {{ form.recursos_educativos_abiertos_verificacion.label_tag }}
-            {{ form.recursos_educativos_abiertos_verificacion }}
-            {{ form.recursos_educativos_abiertos_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.productos.label_tag }}
-            {{ form.productos }}
-            {{ form.productos.errors }}
-        </div>
-        <div>
-            {{ form.productos_verificacion.label_tag }}
-            {{ form.productos_verificacion }}
-            {{ form.productos_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.instituciones_participantes.label_tag }}
-            {{ form.instituciones_participantes }}
-            {{ form.instituciones_participantes.errors }}
-        </div>
-        <div>
-            {{ form.instituciones_participantes_verificacion.label_tag }}
-            {{ form.instituciones_participantes_verificacion }}
-            {{ form.instituciones_participantes_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.alianzas_estrategicas.label_tag }}
-            {{ form.alianzas_estrategicas }}
-            {{ form.alianzas_estrategicas.errors }}
-        </div>
-        <div>
-            {{ form.alianzas_estrategicas_verificacion.label_tag }}
-            {{ form.alianzas_estrategicas_verificacion }}
-            {{ form.alianzas_estrategicas_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.historias.label_tag }}
-            {{ form.historias }}
-            {{ form.historias.errors }}
-        </div>
-        <div>
-            {{ form.historias_verificacion.label_tag }}
-            {{ form.historias_verificacion }}
-            {{ form.historias_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.sostenibilidad.label_tag }}
-            {{ form.sostenibilidad }}
-            {{ form.sostenibilidad.errors }}
-        </div>
-        <div>
-            {{ form.sostenibilidad_verificacion.label_tag }}
-            {{ form.sostenibilidad_verificacion }}
-            {{ form.sostenibilidad_verificacion.errors }}
-        </div>
-        <div>
-            {{ form.numero_editores.label_tag }}
-            {{ form.numero_editores }}
-            {{ form.numero_editores.errors }}
-        </div>
-        <div>
-            {{ form.numero_editores_verificacion.label_tag }}
-            {{ form.numero_editores_verificacion }}
-            {{ form.numero_editores_verificacion.errors }}
+            <h4 class="font-bold">No se pudo guardar la actividad</h4>
+            <ul class="list-disc list-inside mt-1">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
-    <div class="mt-4 flex justify-end gap-2">
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancelar</button>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.proyecto.id_for_label }}">
+                <span class="label-text font-semibold">Proyecto <span class="text-error">*</span></span>
+            </label>
+            {{ form.proyecto }}
+            {% if form.proyecto.errors %}
+            <p class="text-sm text-error mt-1">{{ form.proyecto.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.nombre.id_for_label }}">
+                <span class="label-text font-semibold">Nombre de la Actividad <span class="text-error">*</span></span>
+            </label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+            <p class="text-sm text-error mt-1">{{ form.nombre.errors.0 }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.fecha.id_for_label }}">
+                <span class="label-text font-semibold">Fecha <span class="text-error">*</span></span>
+            </label>
+            {{ form.fecha }}
+            {% if form.fecha.errors %}
+            <p class="text-sm text-error mt-1">{{ form.fecha.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for=""></label>
+        </div>
+    </div>
+
+    <div class="form-control">
+        <label class="label" for="{{ form.descripcion.id_for_label }}">
+            <span class="label-text font-semibold">Descripción (Opcional)</span>
+        </label>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}
+        <p class="text-sm text-error mt-1">{{ form.descripcion.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Métricas Section -->
+    <div class="divider my-4">Métricas</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control">
+            <label class="label" for="{{ form.participantes.id_for_label }}">
+                <span class="label-text font-semibold">Participantes</span>
+            </label>
+            {{ form.participantes }}
+            {% if form.participantes.errors %}
+            <p class="text-sm text-error mt-1">{{ form.participantes.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.participantes_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.participantes_verificacion }}
+            {% if form.participantes_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.participantes_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.personas_alcanzadas.id_for_label }}">
+                <span class="label-text font-semibold">Personas Alcanzadas</span>
+            </label>
+            {{ form.personas_alcanzadas }}
+            {% if form.personas_alcanzadas.errors %}
+            <p class="text-sm text-error mt-1">{{ form.personas_alcanzadas.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.personas_alcanzadas_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.personas_alcanzadas_verificacion }}
+            {% if form.personas_alcanzadas_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.personas_alcanzadas_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.contenidos_creados.id_for_label }}">
+                <span class="label-text font-semibold">Contenidos Creados</span>
+            </label>
+            {{ form.contenidos_creados }}
+            {% if form.contenidos_creados.errors %}
+            <p class="text-sm text-error mt-1">{{ form.contenidos_creados.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.contenidos_creados_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.contenidos_creados_verificacion }}
+            {% if form.contenidos_creados_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.contenidos_creados_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.recursos_educativos_abiertos.id_for_label }}">
+                <span class="label-text font-semibold">Recursos Educativos</span>
+            </label>
+            {{ form.recursos_educativos_abiertos }}
+            {% if form.recursos_educativos_abiertos.errors %}
+            <p class="text-sm text-error mt-1">{{ form.recursos_educativos_abiertos.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.recursos_educativos_abiertos_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.recursos_educativos_abiertos_verificacion }}
+            {% if form.recursos_educativos_abiertos_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.recursos_educativos_abiertos_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.productos.id_for_label }}">
+                <span class="label-text font-semibold">Productos</span>
+            </label>
+            {{ form.productos }}
+            {% if form.productos.errors %}
+            <p class="text-sm text-error mt-1">{{ form.productos.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.productos_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.productos_verificacion }}
+            {% if form.productos_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.productos_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.instituciones_participantes.id_for_label }}">
+                <span class="label-text font-semibold">Instituciones</span>
+            </label>
+            {{ form.instituciones_participantes }}
+            {% if form.instituciones_participantes.errors %}
+            <p class="text-sm text-error mt-1">{{ form.instituciones_participantes.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.instituciones_participantes_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.instituciones_participantes_verificacion }}
+            {% if form.instituciones_participantes_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.instituciones_participantes_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.alianzas_estrategicas.id_for_label }}">
+                <span class="label-text font-semibold">Alianzas Estratégicas</span>
+            </label>
+            {{ form.alianzas_estrategicas }}
+            {% if form.alianzas_estrategicas.errors %}
+            <p class="text-sm text-error mt-1">{{ form.alianzas_estrategicas.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.alianzas_estrategicas_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.alianzas_estrategicas_verificacion }}
+            {% if form.alianzas_estrategicas_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.alianzas_estrategicas_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.historias.id_for_label }}">
+                <span class="label-text font-semibold">Historias</span>
+            </label>
+            {{ form.historias }}
+            {% if form.historias.errors %}
+            <p class="text-sm text-error mt-1">{{ form.historias.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.historias_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.historias_verificacion }}
+            {% if form.historias_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.historias_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.sostenibilidad.id_for_label }}">
+                <span class="label-text font-semibold">Sostenibilidad</span>
+            </label>
+            {{ form.sostenibilidad }}
+            {% if form.sostenibilidad.errors %}
+            <p class="text-sm text-error mt-1">{{ form.sostenibilidad.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.sostenibilidad_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.sostenibilidad_verificacion }}
+            {% if form.sostenibilidad_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.sostenibilidad_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.numero_editores.id_for_label }}">
+                <span class="label-text font-semibold">Número de Editores</span>
+            </label>
+            {{ form.numero_editores }}
+            {% if form.numero_editores.errors %}
+            <p class="text-sm text-error mt-1">{{ form.numero_editores.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.numero_editores_verificacion.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.numero_editores_verificacion }}
+            {% if form.numero_editores_verificacion.errors %}
+            <p class="text-sm text-error mt-1">{{ form.numero_editores_verificacion.errors.0 }}</p>
+            {% endif %}
+        </div>
     </div>
 </form>
+
+<div class="modal-action pt-4">
+    <form method="dialog">
+        <button type="submit" class="btn btn-ghost">Cancelar</button>
+    </form>
+    <button type="submit" form="activity-form" class="btn btn-primary">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        {% if activity %}Actualizar Actividad{% else %}Crear Actividad{% endif %}
+    </button>
+</div>

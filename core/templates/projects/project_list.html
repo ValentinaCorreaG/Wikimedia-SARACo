@@ -20,4 +20,19 @@
     </div>
 
 </div>
+
+<!-- DaisyUI modal (HTMX loads forms/detail/delete into modal-box-content) -->
+<dialog id="modal-container" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto relative">
+        <form method="dialog" class="absolute right-2 top-2">
+            <button type="submit" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar">✕</button>
+        </form>
+        <div id="modal-box-content" data-modal-target="modal-container">
+            <!-- HTMX swaps content here -->
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+    </form>
+</dialog>
 {% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('projects/', views.project_list, name='project_list'),
     path('projects/create/', views.project_create, name='project_create'),
     path('projects/<int:pk>/edit/', views.edit_project, name='project_edit'),
+    path('projects/<int:pk>/', views.project_detail, name='project_detail'),
     path('projects/<int:pk>/delete/', views.delete_project, name='project_delete'),
 
     # Activities CRUD
@@ -21,5 +22,5 @@ urlpatterns = [
     path('activities/create/', views.create_activity, name='create_activity'),
     path('activities/<int:pk>/', views.activity_detail, name='activity_detail'),
     path('activities/<int:pk>/edit/', views.edit_activity, name='edit_activity'),
-    path('activities/<int:pk>/delete/', views.delete_activity, name='delete_activity'),
+    path('activities/<int:pk>/delete/', views.delete_activity, name='activity_delete')
 ]

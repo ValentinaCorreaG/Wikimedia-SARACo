@@ -54,30 +54,30 @@ class ActivityForm(forms.ModelForm):
             'numero_editores_verificacion': 'Links o verificación de editores',
         }
         widgets = {
-            'proyecto': forms.Select(attrs={'class': 'w-full select select-bordered'}),
-            'nombre': forms.TextInput(attrs={'class': 'w-full input input-bordered', 'placeholder': 'Nombre de la actividad'}),
-            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'w-full input input-bordered'}),
-            'descripcion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'rows': 4}),
-            'participantes': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'participantes_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'personas_alcanzadas': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'personas_alcanzadas_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'contenidos_creados': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'contenidos_creados_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'recursos_educativos_abiertos': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'recursos_educativos_abiertos_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'productos': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'productos_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'instituciones_participantes': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'instituciones_participantes_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'alianzas_estrategicas': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'alianzas_estrategicas_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'historias': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'historias_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'sostenibilidad': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'sostenibilidad_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
-            'numero_editores': forms.NumberInput(attrs={'class': 'w-full input input-bordered', 'min': '0'}),
-            'numero_editores_verificacion': forms.Textarea(attrs={'class': 'w-full textarea textarea-bordered', 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'proyecto': forms.Select(attrs={'class': BASE_INPUT_CLASS}),
+            'nombre': forms.TextInput(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Nombre de la actividad'}),
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': BASE_INPUT_CLASS}),
+            'descripcion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'rows': 4}),
+            'participantes': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'participantes_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'personas_alcanzadas': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'personas_alcanzadas_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'contenidos_creados': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'contenidos_creados_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'recursos_educativos_abiertos': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'recursos_educativos_abiertos_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'productos': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'productos_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'instituciones_participantes': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'instituciones_participantes_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'alianzas_estrategicas': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'alianzas_estrategicas_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'historias': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'historias_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'sostenibilidad': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'sostenibilidad_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'numero_editores': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'numero_editores_verificacion': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
         }
 
 # Area choices and colors for consistent styling
@@ -160,29 +160,29 @@ class ProjectForm(forms.ModelForm):
         ]
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'w-full input input-bordered',
+                'class': BASE_INPUT_CLASS,
                 'placeholder': 'Nombre del proyecto'
             }),
             'program': forms.Select(attrs={
-                'class': 'w-full select select-bordered'
+                'class': BASE_INPUT_CLASS
             }),
             'start_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full input input-bordered'
+                'class': BASE_INPUT_CLASS
             }),
             'end_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full input input-bordered'
+                'class': BASE_INPUT_CLASS
             }),
             'status': forms.Select(attrs={
-                'class': 'w-full select select-bordered'
+                'class': BASE_INPUT_CLASS
             }),
             'responsible': forms.TextInput(attrs={
-                'class': 'w-full input input-bordered',
+                'class': BASE_INPUT_CLASS,
                 'placeholder': 'Responsable del proyecto'
             }),
             'description': forms.Textarea(attrs={
-                'class': 'w-full textarea textarea-bordered',
+                'class': BASE_INPUT_CLASS,
                 'rows': 4
             }),
         }

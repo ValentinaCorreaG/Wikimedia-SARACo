@@ -3381,6 +3381,14 @@ details.collapse summary::-webkit-details-marker {
   padding-right: 0.438rem;
 }
 
+.badge-lg {
+  height: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding-left: 0.688rem;
+  padding-right: 0.688rem;
+}
+
 .btm-nav-xs > *:where(.active) {
   border-top-width: 1px;
 }
@@ -3800,9 +3808,9 @@ html:has(.drawer-toggle:checked) {
   margin-right: auto;
 }
 
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .mb-1 {
@@ -3847,10 +3855,6 @@ html:has(.drawer-toggle:checked) {
 
 .ml-2 {
   margin-left: 0.5rem;
-}
-
-.ml-6 {
-  margin-left: 1.5rem;
 }
 
 .ml-7 {
@@ -4341,6 +4345,10 @@ html:has(.drawer-toggle:checked) {
   padding: 0.25rem;
 }
 
+.p-3 {
+  padding: 0.75rem;
+}
+
 .p-4 {
   padding: 1rem;
 }
@@ -4559,11 +4567,6 @@ html:has(.drawer-toggle:checked) {
 .text-error {
   --tw-text-opacity: 1;
   color: rgb(215 51 51 / var(--tw-text-opacity, 1));
-}
-
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
 
 .text-gray-600 {
@@ -4820,11 +4823,6 @@ html:has(.drawer-toggle:checked) {
 
 .hover\:bg-opacity-30:hover {
   --tw-bg-opacity: 0.3;
-}
-
-.hover\:text-gray-800:hover {
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
 }
 
 .hover\:shadow-lg:hover {
