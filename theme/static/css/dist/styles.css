@@ -2025,6 +2025,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-nc,oklch(var(--nc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-primary {
@@ -2034,6 +2039,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-secondary {
@@ -2043,6 +2053,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-s,oklch(var(--s)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-info {
@@ -2051,6 +2066,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-in,oklch(var(--in)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-success {
@@ -2059,6 +2079,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-su,oklch(var(--su)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-warning {
@@ -2067,6 +2092,24 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-wa,oklch(var(--wa)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-wac,oklch(var(--wac)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+}
+
+.badge-celeste {
+  border-color: transparent;
+  --tw-bg-opacity: 1;
+  background-color: oklch(88.759% 0.06563 308.065);
+  --tw-text-opacity: 1;
+  color: oklch(0.2 0.05 220);
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-error {
@@ -2075,6 +2118,11 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
+  width: 6rem;
+  justify-content: center;
+  overflow: hidden;        
+  text-overflow: ellipsis; 
+  white-space: nowrap;
 }
 
 .badge-ghost {
