@@ -94,8 +94,11 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ['name', 'start_date', 'end_date', 'responsible_area', 'activity_type', 'location', 'expected_participants', 'description']
+        fields = ['proyecto', 'name', 'start_date', 'end_date', 'responsible_area', 'activity_type', 'location', 'expected_participants', 'description']
         widgets = {
+            'proyecto': forms.Select(attrs={
+                'class': BASE_INPUT_CLASS,
+            }),
             'name': forms.TextInput(attrs={
                 'class': BASE_INPUT_CLASS,
                 'placeholder': 'Ej: Reunión mensual'

@@ -99,6 +99,7 @@ class Activity(models.Model):
 class Event(models.Model):
     """
     Calendar event with start/end dates, responsible area, and expected participants.
+    Associated with a project for tracking purposes.
     """
     
     class LocationChoices(models.TextChoices):
@@ -116,6 +117,17 @@ class Event(models.Model):
         COMUNITARY_EVENT = "comunity_event", "Encuentro comunitario"
         EDUCATIONAL_PROGRAM = "educational_program", "Programa educativo"
         OTHER = "other", "Otro"
+
+    # Relaciones
+    proyecto = models.ForeignKey(
+        'Project',
+        on_delete=models.CASCADE,
+        related_name='events',
+        verbose_name="Proyecto",
+        null=True,
+        blank=True,
+        help_text="Proyecto asociado a este evento."
+    )
 
     name = models.CharField(max_length=200, verbose_name="Nombre del evento")
     start_date = models.DateField(verbose_name="Fecha de inicio")

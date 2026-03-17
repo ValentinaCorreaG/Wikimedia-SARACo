@@ -22,9 +22,24 @@ from .models import Event, Project, Activity
 # ACTIVITY VIEWS (CRUD)
 # -------------------------
 def activity_list(request):
-    """List all activities."""
+    """List all activities with search and project filter support."""
     activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
-    return render(request, 'activities/activity_list.html', {'activities': activities})
+    projects = Project.objects.all().order_by('name')
+    search = request.GET.get('busqueda', '')
+    project_filter = request.GET.get('proyecto', '')
+    
+    if search:
+        activities = activities.filter(
+            Q(nombre__icontains=search) |
+            Q(descripcion__icontains=search)
+        )
+    
+    if project_filter:
+        activities = activities.filter(proyecto_id=project_filter)
+    
+    if request.htmx:
+        return render(request, 'activities/partials/activity_list.html', {'activities': activities})
+    return render(request, 'activities/activity_list.html', {'activities': activities, 'projects': projects})
 
 def activity_detail(request, pk):
     """Show a single activity's details."""
@@ -161,7 +176,7 @@ def calendar_view(request):
     first_day = datetime(year, month, 1)
     last_day = datetime(year, month, monthrange(year, month)[1])
 
-    events = Event.objects.filter(
+    events = Event.objects.select_related('proyecto').filter(
         Q(start_date__year=year, start_date__month=month) |
         Q(end_date__year=year, end_date__month=month) |
         Q(start_date__lt=first_day, end_date__gt=last_day)
@@ -220,14 +235,13 @@ def calendar_view(request):
 
 def event_list(request):
     """
-    Event list view. Supports search via GET param 'busqueda' and area filter.
+    Event list view. Supports search via GET param 'busqueda' and project filter.
     Returns a partial template when requested via HTMX, full page otherwise.
     """
-    from .forms import AREA_CHOICES
-    
-    events = Event.objects.all().order_by('start_date')
+    events = Event.objects.select_related('proyecto').all().order_by('start_date')
+    projects = Project.objects.all().order_by('name')
     search = request.GET.get('busqueda', '')
-    area_filter = request.GET.get('area', '')
+    project_filter = request.GET.get('proyecto', '')
     
     if search:
         events = events.filter(
@@ -236,12 +250,12 @@ def event_list(request):
             Q(description__icontains=search)
         )
     
-    if area_filter:
-        events = events.filter(responsible_area=area_filter)
+    if project_filter:
+        events = events.filter(proyecto_id=project_filter)
 
     if request.htmx:
         return render(request, 'calendar/partials/event_list.html', {'events': events})
-    return render(request, 'calendar/event_list.html', {'events': events, 'area_choices': AREA_CHOICES})
+    return render(request, 'calendar/event_list.html', {'events': events, 'projects': projects})
 
 @login_required
 def create_event(request):
@@ -289,7 +303,7 @@ def edit_event(request, pk):
             messages.success(request, f'Evento "{event.name}" actualizado exitosamente.')
 
             if request.htmx:
-                events = Event.objects.all().order_by('start_date')
+                events = Event.objects.select_related('proyecto').all().order_by('start_date')
                 response = render(request, 'calendar/partials/event_list.html', {'events': events})
                 response['HX-Trigger'] = json.dumps({
                     'modalClose': {
@@ -326,7 +340,7 @@ def delete_event(request, pk):
         messages.success(request, f'Evento "{event_name}" eliminado exitosamente.')
 
         if request.htmx:
-            events = Event.objects.all().order_by('start_date')
+            events = Event.objects.select_related('proyecto').all().order_by('start_date')
             response = render(request, 'calendar/partials/event_list.html', {'events': events})
             response['HX-Trigger'] = json.dumps({
                 'modalClose': {
@@ -345,7 +359,7 @@ def delete_event(request, pk):
 
 def event_detail(request, pk):
     """Show a single event's details. Renders partial for HTMX modal, full page otherwise."""
-    event = get_object_or_404(Event, pk=pk)
+    event = get_object_or_404(Event.objects.select_related('proyecto'), pk=pk)
     attendance_path = reverse("register_attendance", args=[event.attendance_token])
     attendance_url = request.build_absolute_uri(attendance_path)
 
@@ -382,8 +396,16 @@ def register_attendance(request, attendance_token):
 # -------------------------
 
 def project_list(request):
-    """List all projects."""
+    """List all projects with search support."""
     projects = Project.objects.all()
+    search = request.GET.get('busqueda', '')
+    
+    if search:
+        projects = projects.filter(
+            Q(name__icontains=search) |
+            Q(description__icontains=search) |
+            Q(responsible__icontains=search)
+        )
 
     if request.htmx:
         return render(request, 'projects/partials/project_list.html', {

@@ -14,6 +14,6 @@ class ActivityAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['name', 'start_date', 'end_date', 'responsible_area', 'expected_participants']
-    list_filter = ['start_date']
-    search_fields = ['name', 'responsible_area', 'description']
+    list_display = ['name', 'proyecto', 'start_date', 'end_date', 'responsible_area', 'expected_participants']
+    list_filter = ['start_date', 'proyecto', 'responsible_area']
+    search_fields = ['name', 'responsible_area', 'description', 'proyecto__name']

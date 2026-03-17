@@ -4,17 +4,24 @@
 {% block title %}Lista de Eventos{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-base-200 py-4 sm:py-6 md:py-8">
-    <div class="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
-        
-        <!-- Page header -->
-        <div class="mb-6">
-            <h1 class="text-2xl sm:text-3xl font-bold text-base-content mb-1">Lista de Eventos</h1>
-            <p class="text-sm sm:text-base text-base-content opacity-70">Gestiona todos tus eventos en un solo lugar</p>
-        </div>
+<div class="container mx-auto px-6 py-10">
 
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Gestor de Eventos </h1>
+
+        {% if user.is_superuser %}
+        <button class="btn btn-primary w-40"
+                hx-get="{% url 'create_event' %}"
+                hx-target="#modal-box-content"
+                hx-trigger="click"
+                onclick="document.getElementById('modal-container').showModal()">
+            + Nuevo Evento
+        </button>
+        {% endif %}
+    </div>
+    
         <!-- Calendar vs list view navigation -->
-        <div class="mb-6 flex gap-3">
+        <div class="mb-4 flex gap-3">
             <a href="{% url 'calendar' %}" 
                class="px-6 py-2.5 bg-white text-blue-700 border-2 border-blue-300 rounded-lg hover:bg-blue-50 transition-colors shadow-md hover:shadow-lg">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,8 +29,7 @@
                 </svg>
                 Vista Calendario
             </a>
-            <a href="{% url 'event_list' %}" 
-               class="btn btn-primary">
+            <a href="{% url 'event_list' %}" class="btn btn-primary">
                 <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                 </svg>
@@ -31,63 +37,42 @@
             </a>
         </div>
 
-        <!-- Main content card -->
-        <div class="card p-4 sm:p-5 md:p-6">
-            
-            <!-- Search input, area filter, and create-event button -->
-            <div class="mb-5 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
-                <div class="flex flex-col sm:flex-row gap-3 flex-1 sm:flex-none">
-                    <div class="w-full sm:w-96">
-                        <input type="text" 
-                               name="busqueda" 
-                               placeholder="Buscar eventos..."
-                               class="w-full px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
-                               hx-get="{% url 'event_list' %}"
-                               hx-trigger="keyup changed delay:300ms"
-                               hx-target="#event-list"
-                               hx-include="[name='busqueda'],[name='area']">
-                    </div>
-                    
-                    <select name="area"
-                            class="w-full sm:w-48 px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
-                            hx-get="{% url 'event_list' %}"
-                            hx-trigger="change"
-                            hx-target="#event-list"
-                            hx-include="[name='busqueda'],[name='area']">
-                        <option value="">-- Todas las áreas --</option>
-                        <option value="Apropiación social de conocimiento" {% if request.GET.area == 'Apropiación social de conocimiento' %}selected{% endif %}>
-                            Apropiación social de conocimiento
-                        </option>
-                        <option value="tecnologías y comunidades" {% if request.GET.area == 'tecnologías y comunidades' %}selected{% endif %}>
-                            Tecnologías y comunidades
-                        </option>
-                        <option value="otra" {% if request.GET.area == 'otra' %}selected{% endif %}>
-                            Otra
-                        </option>
-                    </select>
-                </div>
-                {% if user.is_authenticated %} 
-                <button class="btn btn-primary"
-                        hx-get="{% url 'create_event' %}"
-                        hx-target="#modal-box-content"
-                        hx-swap="innerHTML">
-                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Crear Evento
-                </button>
-                {% endif %}
+        <!-- Search + filtros -->
+        <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+            <div class="w-full sm:w-96">
+                <input type="text" 
+                   name="busqueda" 
+                   placeholder="Buscar eventos..."
+                   class="w-full sm:w-96 px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                   hx-get="{% url 'event_list' %}"
+                   hx-trigger="keyup delay:300ms"
+                   hx-target="#event-list"
+                   hx-include="[name='busqueda'],[name='proyecto']">
             </div>
-
-            <!-- Event list (HTMX swaps this area) -->
-            <div id="event-list">
-                {% include 'calendar/partials/event_list.html' %}
-            </div>
+            <select name="proyecto"
+                    class="w-full sm:w-48 px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                    hx-get="{% url 'event_list' %}"
+                    hx-trigger="change"
+                    hx-target="#event-list"
+                    hx-include="[name='busqueda'],[name='proyecto']">
+                <option value="">-- Todos los proyectos --</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}" {% if request.GET.proyecto|add:'0' == project.id|add:'0' %}selected{% endif %}>
+                    {{ project.name }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
-    </div>
-</div>
 
-<!-- DaisyUI modal (HTMX loads forms/detail/delete into modal-box-content) -->
+        <!-- Event list (HTMX swaps this area) -->
+        <div id="event-list">
+            {% include 'calendar/partials/event_list.html' %}
+        </div>
+
+    </div>
+
+
+<!-- DaisyUI modal -->
 <dialog id="modal-container" class="modal">
     <div class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto relative">
         <form method="dialog" class="absolute right-2 top-2">

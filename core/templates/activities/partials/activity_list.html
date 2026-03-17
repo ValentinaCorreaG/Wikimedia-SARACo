@@ -15,7 +15,9 @@
         {% for activity in activities %}
         <tr class="hover h-16">
             <td class="font-medium">{{ activity.nombre }}</td>
-            <td>{{ activity.proyecto }}</td>
+            <td>
+                 <span class="badge badge-celeste">{{ activity.proyecto }} </span>
+            </td>
             <td>{{ activity.fecha }}</td>
             <td>{{ activity.participantes }}</td>
             <td>{{ activity.personas_alcanzadas }}</td>
