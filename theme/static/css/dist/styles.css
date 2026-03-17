@@ -2025,11 +2025,6 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-n,oklch(var(--n)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-nc,oklch(var(--nc)/var(--tw-text-opacity)));
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
 }
 
 .badge-primary {
@@ -2048,11 +2043,6 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-s,oklch(var(--s)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
 }
 
 .badge-info {
@@ -2061,11 +2051,6 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-in,oklch(var(--in)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-inc,oklch(var(--inc)/var(--tw-text-opacity)));
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
 }
 
 .badge-success {
@@ -2073,12 +2058,7 @@ input.tab:checked + .tab-content,
   --tw-bg-opacity: 1;
   background-color: var(--fallback-su,oklch(var(--su)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
-  color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));  
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
+  color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));
 }
 
 .badge-warning {
@@ -2087,35 +2067,14 @@ input.tab:checked + .tab-content,
   background-color: var(--fallback-wa,oklch(var(--wa)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-wac,oklch(var(--wac)/var(--tw-text-opacity)));
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
 }
-.badge-celeste {
-  border-color: transparent;
-  --tw-bg-opacity: 1;
-  background-color: oklch(84.179% 0.07578 305.746);
-  --tw-text-opacity: 1;
-  color: oklch(0.2 0.05 220);
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
-}
+
 .badge-error {
   border-color: transparent;
   --tw-bg-opacity: 1;
   background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
   --tw-text-opacity: 1;
   color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
-  width: 6rem;        
-  justify-content: center;
-  overflow: hidden;        
-  text-overflow: ellipsis; 
-  white-space: nowrap;
 }
 
 .badge-ghost {
@@ -3985,6 +3944,14 @@ html:has(.drawer-toggle:checked) {
   height: 100vh;
 }
 
+.h-1 {
+  height: 0.25rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
 .max-h-\[90vh\] {
   max-height: 90vh;
 }
@@ -4039,6 +4006,18 @@ html:has(.drawer-toggle:checked) {
 
 .w-28 {
   width: 7rem;
+}
+
+.w-40 {
+  width: 10rem;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .min-w-0 {
@@ -4229,6 +4208,10 @@ html:has(.drawer-toggle:checked) {
   white-space: nowrap;
 }
 
+.whitespace-normal {
+  white-space: normal;
+}
+
 .rounded {
   border-radius: 0.25rem;
 }
@@ -4341,6 +4324,10 @@ html:has(.drawer-toggle:checked) {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
 
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
 .from-blue-50 {
   --tw-gradient-from: #eff6ff var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(239 246 255 / 0) var(--tw-gradient-to-position);
@@ -4350,6 +4337,18 @@ html:has(.drawer-toggle:checked) {
 .from-green-50 {
   --tw-gradient-from: #f0fdf4 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(240 253 244 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-support-culture {
+  --tw-gradient-from: #C62828 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(198 40 40 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-support-culture\/10 {
+  --tw-gradient-from: rgb(198 40 40 / 0.1) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(198 40 40 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
@@ -4363,6 +4362,14 @@ html:has(.drawer-toggle:checked) {
 
 .to-secondary\/10 {
   --tw-gradient-to: var(--fallback-s,oklch(var(--s)/0.1)) var(--tw-gradient-to-position);
+}
+
+.to-support-community {
+  --tw-gradient-to: #2E7D32 var(--tw-gradient-to-position);
+}
+
+.to-support-education\/10 {
+  --tw-gradient-to: rgb(106 27 154 / 0.1) var(--tw-gradient-to-position);
 }
 
 .stroke-current {
@@ -4447,6 +4454,11 @@ html:has(.drawer-toggle:checked) {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .pt-10 {
@@ -4689,6 +4701,15 @@ html:has(.drawer-toggle:checked) {
 .text-teal-600 {
   --tw-text-opacity: 1;
   color: rgb(13 148 136 / var(--tw-text-opacity, 1));
+}
+
+.text-base-100 {
+  --tw-text-opacity: 1;
+  color: var(--fallback-b1,oklch(var(--b1)/var(--tw-text-opacity, 1)));
+}
+
+.text-base-content\/90 {
+  color: var(--fallback-bc,oklch(var(--bc)/0.9));
 }
 
 .opacity-50 {
@@ -4945,6 +4966,10 @@ html:has(.drawer-toggle:checked) {
 
   .sm\:w-96 {
     width: 24rem;
+  }
+
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sm\:flex-row {

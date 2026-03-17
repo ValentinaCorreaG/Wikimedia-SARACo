@@ -513,3 +513,12 @@ def delete_project(request, pk):
     return render(request, 'projects/partials/project_delete.html', {
         'project': project
     })
+
+
+# -------------------------
+# ABOUT US VIEW
+# -------------------------
+
+def about_us(request):
+    """Redirect to Wikimedia Colombia official page in Spanish."""
+    return redirect('https://es.m.wikipedia.org/wiki/Wikimedia_Colombia')
