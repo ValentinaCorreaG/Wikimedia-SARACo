@@ -27,7 +27,28 @@
                 Inicio
             </a>
         </li>
-        <li>
+            <!-- Projects - Visible for all users -->
+            <li>
+                <a href="{% url 'project_list' %}" class="gap-2">
+                    <svg class="w-5 h-5 text-support-culture" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h6M9 17H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v6"/>
+                    </svg>
+                    Proyectos
+                </a>
+            </li>
+
+            <!-- Activities - Visible for all users -->
+            <li>
+                <a href="{% url 'activity_list' %}" class="gap-2">
+                    <svg class="w-5 h-5 text-support-technology" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Actividades
+                </a>
+            </li>
+
+            <!-- Events - Visible for all users-->
+             <li>
             <a href="{% url 'calendar' %}" class="gap-2">
                 <svg class="w-5 h-5 text-support-education" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -35,11 +56,10 @@
                 Calendario
             </a>
         </li>
-
         <!-- Reports - Visible for all users -->
         <li>
             <a href="#" class="gap-2">
-                <svg class="w-5 h-5 text-support-technology" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-support-reports" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>
                 Reportes
@@ -48,8 +68,8 @@
 
         <!-- About Us - Visible for all users -->
         <li>
-            <a href="#" class="gap-2">
-                <svg class="w-5 h-5 text-support-culture" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{% url 'about_us' %}" class="gap-2">
+                <svg class="w-5 h-5 text-support-home" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Acerca de Nosotros

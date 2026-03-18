@@ -1,0 +1,30 @@
+<h3 class="font-bold text-lg mb-4">Confirmar eliminación</h3>
+
+<p class="py-4">
+    ¿Estás seguro de que deseas eliminar el proyecto
+    <strong>{{ project.name }}</strong>?
+</p>
+
+<p class="text-sm text-base-content/60 mb-2">
+    <span class="font-medium">Fechas:</span>
+    {{ project.start_date|date:"d/m/Y" }} - {{ project.end_date|date:"d/m/Y" }}
+</p>
+
+<p class="text-sm text-base-content/60 mb-4">
+    Esta acción no se puede deshacer.
+</p>
+
+<div class="modal-action">
+    <form method="dialog">
+        <button class="btn btn-ghost">Cancelar</button>
+    </form>
+
+    <form hx-post="{% url 'project_delete' project.pk %}"
+          hx-target="#project-list"
+          hx-swap="innerHTML">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-error">
+            Eliminar
+        </button>
+    </form>
+</div>

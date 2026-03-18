@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-10">
+
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Gestor de Actividades</h1>
+
+        {% if user.is_superuser %}
+        <button class="btn btn-primary w-40"
+                hx-get="{% url 'create_activity' %}"
+                hx-target="#modal-box-content"
+                hx-trigger="click"
+                onclick="document.getElementById('modal-container').showModal()">
+            + Nueva Actividad
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Search and filter section -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+        <div class="w-full sm:w-96">
+            <input type="text" 
+                   name="busqueda" 
+                   placeholder="Buscar actividades..."
+                   class="w-full px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                   hx-get="{% url 'activity_list' %}"
+                   hx-trigger="keyup changed delay:300ms"
+                   hx-target="#activity-list"
+                   hx-include="[name='busqueda'],[name='proyecto']">
+        </div>
+        
+        <select name="proyecto"
+                class="w-full sm:w-48 px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                hx-get="{% url 'activity_list' %}"
+                hx-trigger="change"
+                hx-target="#activity-list"
+                hx-include="[name='busqueda'],[name='proyecto']">
+            <option value="">-- Todos los proyectos --</option>
+            {% for project in projects %}
+            <option value="{{ project.id }}" {% if request.GET.proyecto|add:'0' == project.id|add:'0' %}selected{% endif %}>
+                {{ project.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div id="activity-list">
+        {% include "activities/partials/activity_list.html" %}
+    </div>
+
+</div>
+
+<!-- DaisyUI modal (HTMX loads forms/detail/delete into modal-box-content) -->
+<dialog id="modal-container" class="modal">
+    <div class="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto relative">
+        <form method="dialog" class="absolute right-2 top-2">
+            <button type="submit" class="btn btn-sm btn-circle btn-ghost" aria-label="Cerrar">✕</button>
+        </form>
+        <div id="modal-box-content" data-modal-target="modal-container">
+            <!-- HTMX swaps content here -->
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+    </form>
+</dialog>
+{% endblock %}

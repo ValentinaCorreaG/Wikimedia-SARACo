@@ -1,0 +1,78 @@
+<div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Programa</th>
+                <th>Estado</th>
+                <th>Fechas</th>
+                <th>Responsable</th>
+                <th class="text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr class ="hover h-16">
+                <td class="font-medium">{{ project.name }}</td>
+                <td>{{ project.get_program_display }}</td>
+                <td>
+                    <span class="badge 
+                        {% if project.status == 'active' %}badge-success
+                        {% elif project.status == 'paused' %}badge-warning
+                        {% elif project.status == 'finished' %}badge-neutral
+                        {% else %}badge-info{% endif %}">
+                        {{ project.get_status_display }}
+                    </span>
+                </td>
+                <td class="text-sm">
+                    {{ project.start_date|date:"d/m/Y" }} - {{ project.end_date|date:"d/m/Y" }}
+                </td>
+                <td>{{ project.responsible }}</td>
+
+                <td class="text-right space-x-2">
+                  {% if project.pk %}
+                    <div class="flex gap-1 flex-wrap justify-end">
+                        <button class="btn btn-xs btn-ghost"
+                                hx-get="{% url 'project_detail' project.pk %}"
+                                hx-target="#modal-box-content"
+                                onclick="document.getElementById('modal-container').showModal()"
+                                aria-label="Ver {{ project.name }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                        {% if request.user.is_superuser %}
+                        <button class="btn btn-xs btn-ghost"
+                                hx-get="{% url 'project_edit' project.pk %}"
+                                hx-target="#modal-box-content"
+                                onclick="document.getElementById('modal-container').showModal()"
+                                aria-label="Editar {{ project.name }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-xs btn-ghost text-error"
+                                hx-get="{% url 'project_delete' project.pk %}"
+                                hx-target="#modal-box-content"
+                                onclick="document.getElementById('modal-container').showModal()"
+                                aria-label="Eliminar {{ project.name }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/>
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </div>
+                  {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-10 text-base-content/60">
+                    No hay proyectos registrados aún.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

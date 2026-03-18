@@ -1,0 +1,120 @@
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+    <div class="pt-10 flex items-center justify-center shadow-xl bg-white mb-16">
+        <div class=" px-20 rounded-3xl w-full text-center">
+            <h1 class="text-5xl font-bold text-gray-900 mb-4">
+                Sistema de Actividades y Reportes
+            </h1>
+            <p class="text-2xl text-indigo-600 mb-8">
+                Wikimedia Colombia
+            </p>
+            <p class="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto mb-12">
+                SARA es la plataforma de gestión de actividades y métricas para el seguimiento de la estrategia
+                "Diseñar Futuros Posibles 2025–2027". Aquí documentamos, medimos y celebramos el trabajo
+                colaborativo por el conocimiento libre.
+            </p>
+        </div>
+    </div>
+    <div class="mb-16">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">Estadisticas Wikimedia Colombia 2025</h2>
+            {% if outreach_metrics.error %}
+                <span class="badge badge-error">Error al cargar metricas</span>
+            {% else %}
+                <span class="badge badge-success">Actualizado</span>
+            {% endif %}
+        </div>
+
+        {% if outreach_metrics.error %}
+            <div class="alert alert-warning">
+                <span>No fue posible obtener las metricas del Outreach Dashboard.</span>
+            </div>
+        {% else %}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-emerald-600">{{ outreach_metrics.programs }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Programas</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-purple-600">{{ outreach_metrics.editors }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Editores</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-emerald-600">{{ outreach_metrics.words_added }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Palabras anadidas</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-purple-600">{{ outreach_metrics.references_added }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Referencias anadidas</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-amber-600">{{ outreach_metrics.article_views }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Visualizaciones</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-teal-600">{{ outreach_metrics.articles_edited }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Articulos editados</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-blue-600">{{ outreach_metrics.articles_created }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Articulos creados</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+                    <div class="text-3xl font-bold text-indigo-600">{{ outreach_metrics.commons_uploads }}</div>
+                    <div class="text-sm text-gray-600 mt-2">Subidas a Commons</div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- Programas Misionares -->
+            <div class="mt-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Programas Misionales</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-lg shadow">
+                        <h3 class="text-2xl font-bold text-green-700 mb-4">
+                            Apropiación Social de Conocimiento
+                        </h3>
+                        <p class="text-gray-700">
+                            Desarrolla procesos donde se propende por el acceso, democratización y 
+                            uso de saberes para la transformación de territorios.
+                        </p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg shadow">
+                        <h3 class="text-2xl font-bold text-blue-700 mb-4">
+                            Tecnologías y Comunidades
+                        </h3>
+                        <p class="text-gray-700">
+                            Desarrolla procesos de tecnologías e infraestructura de lo abierto y 
+                            sostenibilidad de comunidades.
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 mb-24">
+
+    <!-- Title -->
+    <h2 class="text-3xl font-bold text-gray-900 mb-8">
+        Actividades SARA 2026
+    </h2>
+
+    <!-- Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+        <div class="bg-white p-8 rounded-xl shadow text-center">
+            <div class="text-4xl font-bold text-teal-600 mb-2"> {{ activities_count }}</div>
+            <div class="text-sm text-gray-600">Actividades registradas</div>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow text-center">
+            <div class="text-4xl font-bold text-teal-600 mb-2">2</div>
+            <div class="text-sm text-gray-600">Programas activos</div>
+        </div>
+
+        <div class="bg-white p-8 rounded-xl shadow text-center">
+            <div class="text-4xl font-bold text-teal-600 mb-2">0</div>
+            <div class="text-sm text-gray-600">Ciudades alcanzadas</div>
+        </div>
+
+    </div>
+</div>

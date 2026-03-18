@@ -5,24 +5,164 @@ Handles the calendar view, event list, and CRUD operations for events.
 Supports both full-page and HTMX partial responses.
 """
 import json
-from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from django.contrib import messages
+from django.http import HttpResponse, HttpResponseForbidden
 from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
-from .models import Event
-from .forms import EventForm
-from .forms import AttendanceForm
+from django.contrib import messages
+from django.contrib.auth import login
+from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
 from django.urls import reverse
+from .services import OutreachMetricsService
+from .models import Event, Project, Activity
+
+# -------------------------
+# ACTIVITY VIEWS (CRUD)
+# -------------------------
+def activity_list(request):
+    """List all activities with search and project filter support."""
+    activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+    projects = Project.objects.all().order_by('name')
+    search = request.GET.get('busqueda', '')
+    project_filter = request.GET.get('proyecto', '')
+    
+    if search:
+        activities = activities.filter(
+            Q(nombre__icontains=search) |
+            Q(descripcion__icontains=search)
+        )
+    
+    if project_filter:
+        activities = activities.filter(proyecto_id=project_filter)
+    
+    if request.htmx:
+        return render(request, 'activities/partials/activity_list.html', {'activities': activities})
+    return render(request, 'activities/activity_list.html', {'activities': activities, 'projects': projects})
+
+def activity_detail(request, pk):
+    """Show a single activity's details."""
+    activity = get_object_or_404(Activity, pk=pk)
+    return render(request, 'activities/partials/activity_detail.html', {'activity': activity})
+
+def create_activity(request):
+    """Create a new activity. Only superusers can create."""
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para crear actividades.')
+        return redirect('activity_list')
+    if request.method == 'POST':
+        form = ActivityForm(request.POST)
+        if form.is_valid():
+            activity = form.save()
+            messages.success(request, f'Actividad "{activity.nombre}" creada exitosamente.')
+            if request.htmx:
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
+                return response
+            return redirect('activity_list')
+    else:
+        form = ActivityForm()
+    if request.htmx:
+        from django.urls import reverse
+        return render(request, 'activities/partials/activity_form.html', {
+            'form': form,
+            'title': 'Crear Actividad',
+            'action': 'crear',
+            'form_action': reverse('create_activity'),
+        })
+    return render(request, 'activities/partials/activity_form.html', {
+        'form': form,
+        'title': 'Crear Actividad',
+        'form_action': reverse('create_activity'),
+    })
+
+def edit_activity(request, pk):
+    """Edit an existing activity. Only superusers can edit."""
+    activity = get_object_or_404(Activity, pk=pk)
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para editar actividades.')
+        return redirect('activity_list')
+    if request.method == 'POST':
+        form = ActivityForm(request.POST, instance=activity)
+        if form.is_valid():
+            activity = form.save()
+            messages.success(request, f'Actividad "{activity.nombre}" actualizada exitosamente.')
+            if request.htmx:
+                activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+                response = render(request, 'activities/partials/activity_list.html', {'activities': activities})
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
+                return response
+            return redirect('activity_list')
+    else:
+        form = ActivityForm(instance=activity)
+    if request.htmx:
+        from django.urls import reverse
+        return render(request, 'activities/partials/activity_form.html', {
+            'form': form,
+            'activity': activity,
+            'title': 'Editar Actividad',
+            'action': 'editar',
+            'form_action': reverse('edit_activity', args=[activity.pk]),
+        })
+    return render(request, 'activities/partials/activity_form.html', {
+        'form': form,
+        'activity': activity,
+        'title': 'Editar Actividad',
+        'form_action': reverse('edit_activity', args=[activity.pk]),
+    })
+
+def delete_activity(request, pk):
+    """Delete an activity. Only superusers can delete."""
+    activity = get_object_or_404(Activity, pk=pk)
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para eliminar actividades.')
+        return redirect('activity_list')
+    if request.method == 'POST':
+        activity_name = activity.nombre
+        activity.delete()
+        messages.success(request, f'Actividad "{activity_name}" eliminada exitosamente.')
+        if request.htmx:
+            activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+            response = render(request, 'activities/partials/activity_list.html', {'activities': activities})
+            response['HX-Trigger'] = json.dumps({
+                'modalClose': {
+                    'modalId': 'modal-container',
+                    'contentId': 'modal-box-content',
+                    'reload': True
+                }
+            })
+            return response
+        return redirect('activity_list')
+    if request.htmx:
+        return render(request, 'activities/partials/activity_delete.html', {'activity': activity})
+    return render(request, 'activities/partials/activity_delete.html', {'activity': activity})
+
 
 def base(request):
     """Render the home page."""
-    return render(request, 'base.html')
+    outreach_metrics = OutreachMetricsService().fetch_metrics()
+    activities_count = Event.objects.count()
 
+    context = {
+        "outreach_metrics": outreach_metrics,
+        "activities_count": activities_count,
+        "active_programs": 2,
+    }
+
+    return render(request, 'base.html', context)
 
 def calendar_view(request):
     """
@@ -36,7 +176,7 @@ def calendar_view(request):
     first_day = datetime(year, month, 1)
     last_day = datetime(year, month, monthrange(year, month)[1])
 
-    events = Event.objects.filter(
+    events = Event.objects.select_related('proyecto').filter(
         Q(start_date__year=year, start_date__month=month) |
         Q(end_date__year=year, end_date__month=month) |
         Q(start_date__lt=first_day, end_date__gt=last_day)
@@ -48,6 +188,10 @@ def calendar_view(request):
     next_year = year if month < 12 else year + 1
 
     week_days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+
+    # -------------------------
+    # ACTIVITY VIEWS (CRUD)
+    # -------------------------
     first_weekday = first_day.weekday()
 
     weeks = []
@@ -91,14 +235,13 @@ def calendar_view(request):
 
 def event_list(request):
     """
-    Event list view. Supports search via GET param 'busqueda' and area filter.
+    Event list view. Supports search via GET param 'busqueda' and project filter.
     Returns a partial template when requested via HTMX, full page otherwise.
     """
-    from .forms import AREA_CHOICES
-    
-    events = Event.objects.all().order_by('start_date')
+    events = Event.objects.select_related('proyecto').all().order_by('start_date')
+    projects = Project.objects.all().order_by('name')
     search = request.GET.get('busqueda', '')
-    area_filter = request.GET.get('area', '')
+    project_filter = request.GET.get('proyecto', '')
     
     if search:
         events = events.filter(
@@ -107,12 +250,12 @@ def event_list(request):
             Q(description__icontains=search)
         )
     
-    if area_filter:
-        events = events.filter(responsible_area=area_filter)
+    if project_filter:
+        events = events.filter(proyecto_id=project_filter)
 
     if request.htmx:
         return render(request, 'calendar/partials/event_list.html', {'events': events})
-    return render(request, 'calendar/event_list.html', {'events': events, 'area_choices': AREA_CHOICES})
+    return render(request, 'calendar/event_list.html', {'events': events, 'projects': projects})
 
 @login_required
 def create_event(request):
@@ -160,7 +303,7 @@ def edit_event(request, pk):
             messages.success(request, f'Evento "{event.name}" actualizado exitosamente.')
 
             if request.htmx:
-                events = Event.objects.all().order_by('start_date')
+                events = Event.objects.select_related('proyecto').all().order_by('start_date')
                 response = render(request, 'calendar/partials/event_list.html', {'events': events})
                 response['HX-Trigger'] = json.dumps({
                     'modalClose': {
@@ -197,7 +340,7 @@ def delete_event(request, pk):
         messages.success(request, f'Evento "{event_name}" eliminado exitosamente.')
 
         if request.htmx:
-            events = Event.objects.all().order_by('start_date')
+            events = Event.objects.select_related('proyecto').all().order_by('start_date')
             response = render(request, 'calendar/partials/event_list.html', {'events': events})
             response['HX-Trigger'] = json.dumps({
                 'modalClose': {
@@ -216,7 +359,7 @@ def delete_event(request, pk):
 
 def event_detail(request, pk):
     """Show a single event's details. Renders partial for HTMX modal, full page otherwise."""
-    event = get_object_or_404(Event, pk=pk)
+    event = get_object_or_404(Event.objects.select_related('proyecto'), pk=pk)
     attendance_path = reverse("register_attendance", args=[event.attendance_token])
     attendance_url = request.build_absolute_uri(attendance_path)
 
@@ -246,3 +389,136 @@ def register_attendance(request, attendance_token):
         'event': event,
         'form': form,
     })
+
+
+# -------------------------
+# PROJECT VIEWS (CRUD)
+# -------------------------
+
+def project_list(request):
+    """List all projects with search support."""
+    projects = Project.objects.all()
+    search = request.GET.get('busqueda', '')
+    
+    if search:
+        projects = projects.filter(
+            Q(name__icontains=search) |
+            Q(description__icontains=search) |
+            Q(responsible__icontains=search)
+        )
+
+    if request.htmx:
+        return render(request, 'projects/partials/project_list.html', {
+            'projects': projects
+        })
+
+    return render(request, 'projects/project_list.html', {
+        'projects': projects
+    })
+
+def project_detail(request, pk):
+    """Show a single project's details. Renders partial for HTMX modal, full page otherwise."""
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.htmx:
+        return render(request, 'projects/partials/project_detail.html', {'project': project})
+    return render(request, 'projects/partials/project_detail.html', {'project': project})
+
+def project_create(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save()
+
+            if request.htmx:
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
+                return response
+
+            return redirect('project_list')
+
+    else:
+        form = ProjectForm()
+
+    from django.urls import reverse
+    return render(request, 'projects/partials/project_form.html', {
+        'form': form,
+        'title': 'Nuevo Proyecto',
+        'form_action': reverse('project_create'),
+    })
+
+def edit_project(request, pk):
+    """Edit existing project (modal + HTMX)."""
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            messages.success(request, f'Proyecto "{project.name}" actualizado exitosamente.')
+
+            if request.htmx:
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
+                return response
+
+            return redirect('project_list')
+    else:
+        form = ProjectForm(instance=project)
+
+    from django.urls import reverse
+    return render(request, 'projects/partials/project_form.html', {
+        'form': form,
+        'project': project,
+        'title': 'Editar Proyecto',
+        'action': 'editar',
+        'form_action': reverse('project_edit', args=[project.pk]),
+    })
+
+
+def delete_project(request, pk):
+    """Delete project with modal confirmation."""
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.method == 'POST':
+        name = project.name
+        project.delete()
+        messages.success(request, f'Proyecto "{name}" eliminado exitosamente.')
+
+        if request.htmx:
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = json.dumps({
+                'modalClose': {
+                    'modalId': 'modal-container',
+                    'contentId': 'modal-box-content',
+                    'reload': True
+                }
+            })
+            return response
+
+        return redirect('project_list')
+
+    return render(request, 'projects/partials/project_delete.html', {
+        'project': project
+    })
+
+
+# -------------------------
+# ABOUT US VIEW
+# -------------------------
+
+def about_us(request):
+    """Redirect to Wikimedia Colombia official page in Spanish."""
+    return redirect('https://es.m.wikipedia.org/wiki/Wikimedia_Colombia')

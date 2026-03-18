@@ -1,13 +1,13 @@
 <!-- Event list partial: used by event list page and HTMX -->
 
 {% if events %}
-<div class="card  bg-base-100 shadow-xl">
-    <div class="card-body rounded-md">
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
+<div class="overflow-x-auto bg-white rounded-xl shadow">
+<table class="table table-zebra w-full">
+    <thead>
                 <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Proyecto</th>
                         <th>Inicio</th>
                         <th>Fin</th>
                         <th>Área</th>
@@ -19,6 +19,13 @@
                     {% for event in events %}
                     <tr class="hover h-16">
                         <td class="font-bold">{{ event.name }}</td>
+                        <td>
+                            {% if event.proyecto %}
+                                <span class="badge badge-celeste">{{ event.proyecto.name }}</span>
+                            {% else %}
+                                <span class="text-base-content/40">—</span>
+                            {% endif %}
+                        </td>
                         <td>{{ event.start_date|date:"d/m/Y" }}</td>
                         <td>{{ event.end_date|date:"d/m/Y" }}</td>
                         <td>
@@ -32,7 +39,7 @@
                         </td>
                         <td>{{ event.expected_participants }}</td>
                         <td>
-                            <div class="flex gap-1 flex-wrap">
+                            <div class="flex flex-wrap">
                                 <button class="btn btn-sm btn-ghost" 
                                         hx-get="{% url 'event_detail' event.pk %}"
                                         hx-target="#modal-box-content"
@@ -68,15 +75,13 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-8 text-base-content/50">
+                        <td colspan="7" class="text-center py-8 text-base-content/50">
                             No hay eventos
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
 </div>
 {% else %}
 <!-- Empty state when no events and no rows rendered inside table -->

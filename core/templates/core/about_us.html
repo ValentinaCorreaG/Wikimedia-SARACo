@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-10">
+
+    <!-- Hero Section -->
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold text-center mb-6">Acerca de Wikimedia Colombia</h1>
+        <div class="h-1 w-24 bg-gradient-to-r from-support-culture to-support-community mx-auto"></div>
+    </div>
+
+    <!-- Introduction -->
+    <div class="mb-12">
+        <div class="bg-base-200 rounded-lg p-8">
+            <p class="text-lg text-base-content/90 leading-relaxed">
+                Wikimedia Colombia es una organización de la sociedad civil que trabaja por la promoción del conocimiento libre a través de la democratización del conocimiento. Busca responder a los desafíos y oportunidades que plantea la sociedad de la información para la transformación de diferentes contextos. Promueve procesos de investigación e implementación en educación mediática e informacional, apropiación social del conocimiento y ciudadanía digital.
+            </p>
+        </div>
+    </div>
+
+    <!-- Mission and Vision Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        
+        <!-- Mission Card -->
+        <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-shadow">
+            <div class="card-body">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-8 h-8 text-support-culture" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <h2 class="card-title text-2xl">Misión</h2>
+                </div>
+                <p class="text-base-content/80 leading-relaxed">
+                    {{ mission }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Vision Card -->
+        <div class="card bg-base-100 shadow-md border border-base-300 hover:shadow-lg transition-shadow">
+            <div class="card-body">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-8 h-8 text-support-education" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <h2 class="card-title text-2xl">Visión</h2>
+                </div>
+                <p class="text-base-content/80 leading-relaxed">
+                    {{ vision }}
+                </p>
+            </div>
+        </div>
+    </grid>
+
+    <!-- Values Section -->
+    <div class="mb-12">
+        <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+            <svg class="w-8 h-8 text-support-community" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Nuestros Valores
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for value in values %}
+                <div class="badge badge-lg badge-primary py-6 px-4 text-base-100 text-center whitespace-normal font-semibold">
+                    {{ value }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Objectives Section -->
+    <div class="mb-12">
+        <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+            <svg class="w-8 h-8 text-support-technology" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Nuestros Objetivos
+        </h2>
+        <div class="space-y-4">
+            {% for objective in objectives %}
+                <div class="alert alert-info bg-base-200 border border-base-300">
+                    <svg class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-base-content/90">{{ objective }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="bg-gradient-to-r from-support-culture/10 to-support-education/10 rounded-lg p-8 mb-8">
+        <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+            <svg class="w-8 h-8 text-support-home" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Contáctanos
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold text-lg mb-2 text-base-content/90">Sitio Web Oficial</h3>
+                <a href="https://wikimediacolombia.org" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                    wikimediacolombia.org
+                </a>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-2 text-base-content/90">Email</h3>
+                <a href="mailto:contacto@wikimediacolombia.org" class="link link-primary">
+                    contacto@wikimediacolombia.org
+                </a>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-2 text-base-content/90">Wiki Wikimedia</h3>
+                <a href="https://co.wikimedia.org/" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                    co.wikimedia.org
+                </a>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-2 text-base-content/90">Redes Sociales</h3>
+                <a href="https://t.me/+ay640MIFbvFjODIx" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                    Canal de Telegram
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategy Section -->
+    <div class="card bg-base-100 shadow-md border border-base-300 mb-8">
+        <div class="card-body">
+            <h2 class="card-title text-2xl mb-4 flex items-center gap-3">
+                <svg class="w-8 h-8 text-support-reports" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Estrategia 2025-2027
+            </h2>
+            <p class="text-base-content/80 mb-4">
+                <strong class="text-base-content">Disoñar Futuros Posibles:</strong> Wikimedia Colombia apoya la transformación de la sociedad fomentando la participación activa y diversa de las comunidades en la construcción y sostenimiento del Movimiento Wikimedia en Colombia, promoviendo el multiculturalismo, la equidad y la descentralización, y contribuyendo a la creación de narrativas colectivas y esperanzadoras con múltiples actores para imaginar y construir futuros posibles.
+            </p>
+            <div class="divider"></div>
+            <h3 class="text-xl font-semibold mb-3">Pilares Estratégicos:</h3>
+            <ul class="list-disc list-inside space-y-2 text-base-content/80">
+                <li>Wikimedia Colombia crece con las comunidades que se relaciona para transformar la sociedad</li>
+                <li>Promueve multiculturalismo, diversidad, bienestar, equidad y descentralización</li>
+                <li>Contribuye a construir narrativas multisectoriales para diseñar futuros posibles</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

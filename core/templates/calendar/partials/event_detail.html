@@ -5,6 +5,19 @@
 
 <!-- Main info (dates, area, participants, description) -->
 <div class="space-y-4 mb-6">
+    <!-- Project -->
+    {% if event.proyecto %}
+    <div class="flex items-start bg-base-200 rounded-lg p-4 border-l-4 border-secondary">
+        <svg class="w-6 h-6 text-secondary mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+            <p class="text-sm opacity-70 mb-1">Proyecto</p>
+            <p class="text-lg font-semibold">{{ event.proyecto.name }}</p>
+        </div>
+    </div>
+    {% endif %}
+    
     <!-- Start/end dates and duration -->
     <div class="bg-base-200 rounded-lg p-4 border-l-4 border-primary">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

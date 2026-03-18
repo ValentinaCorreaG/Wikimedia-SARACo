@@ -1,0 +1,166 @@
+<!-- Activity title -->
+<div class="mb-6">
+    <h4 class="text-2xl font-bold text-base-content">{{ activity.nombre }}</h4>
+</div>
+
+<!-- Main info -->
+<div class="space-y-4 mb-6">
+    <!-- Project and Date -->
+    <div class="bg-base-200 rounded-lg p-4 border-l-4 border-primary">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <div class="flex items-center text-primary mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-semibold">Proyecto</span>
+                </div>
+                <p class="font-medium ml-7">{{ activity.proyecto }}</p>
+            </div>
+            <div>
+                <div class="flex items-center text-primary mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="font-semibold">Fecha</span>
+                </div>
+                <p class="font-medium ml-7">{{ activity.fecha|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    {% if activity.descripcion %}
+    <div class="bg-base-200 rounded-lg p-4">
+        <p class="text-sm opacity-70 mb-2 font-semibold">Descripción</p>
+        <p>{{ activity.descripcion }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Metrics Section -->
+    <div class="bg-base-200 rounded-lg p-4">
+        <h5 class="text-lg font-semibold mb-4 flex items-center text-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Métricas
+        </h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Participantes -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Participantes</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.participantes }}</p>
+                {% if activity.participantes_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.participantes_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Personas alcanzadas -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Personas alcanzadas</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.personas_alcanzadas }}</p>
+                {% if activity.personas_alcanzadas_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.personas_alcanzadas_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Contenidos creados -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Contenidos creados</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.contenidos_creados }}</p>
+                {% if activity.contenidos_creados_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.contenidos_creados_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Recursos educativos -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Recursos abiertos</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.recursos_educativos_abiertos }}</p>
+                {% if activity.recursos_educativos_abiertos_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.recursos_educativos_abiertos_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Productos -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Productos</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.productos }}</p>
+                {% if activity.productos_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.productos_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Instituciones participantes -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Instituciones</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.instituciones_participantes }}</p>
+                {% if activity.instituciones_participantes_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.instituciones_participantes_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Alianzas estratégicas -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Alianzas</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.alianzas_estrategicas }}</p>
+                {% if activity.alianzas_estrategicas_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.alianzas_estrategicas_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Historias -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Historias</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.historias }}</p>
+                {% if activity.historias_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.historias_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Sostenibilidad -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Sostenibilidad</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.sostenibilidad }}</p>
+                {% if activity.sostenibilidad_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.sostenibilidad_verificacion }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Número de editores -->
+            <div class="bg-base-100 rounded p-3">
+                <p class="text-sm opacity-70 font-semibold">Editores</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.numero_editores }}</p>
+                {% if activity.numero_editores_verificacion %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.numero_editores_verificacion }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Created/updated timestamps -->
+    <div class="text-xs opacity-60 pt-4 border-t border-base-300 grid grid-cols-2 gap-2">
+        <div><span class="font-semibold">Creado:</span> {{ activity.created_at|date:"d/m/Y H:i" }}</div>
+        <div><span class="font-semibold">Actualizado:</span> {{ activity.updated_at|date:"d/m/Y H:i" }}</div>
+    </div>
+</div>
+
+<!-- DaisyUI modal-action: close and edit -->
+<div class="modal-action pt-4 border-t border-base-300">
+    <form method="dialog">
+        <button type="submit" class="btn btn-ghost">Cerrar</button>
+    </form>
+    {% if request.user.is_superuser %}
+    <button type="button"
+            hx-get="{% url 'edit_activity' activity.pk %}"
+            hx-target="#modal-box-content"
+            hx-swap="innerHTML"
+            class="btn btn-primary">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+
+            Editar Actividad
+    </button>
+    {% endif %}
+</div>
