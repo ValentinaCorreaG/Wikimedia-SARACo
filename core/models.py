@@ -49,10 +49,22 @@ class Activity(models.Model):
     Activity record associated with a project, including metrics and verification links.
     Field names in Spanish, code and comments in English.
     """
+    
+    PROGRAM_CHOICES = [
+        ('ASC', 'Apropiación social de conocimiento'),
+        ('TC', 'Tecnologías y comunidades'),
+    ]
+    
     proyecto = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='activities', verbose_name="Proyecto")
     nombre = models.CharField(max_length=200, verbose_name="Nombre de la actividad")
     fecha = models.DateField(verbose_name="Fecha de la actividad")
     descripcion = models.TextField(blank=True, verbose_name="Descripción")
+    area = models.CharField(
+        max_length=3,
+        choices=PROGRAM_CHOICES,
+        blank=True,
+        verbose_name="Área de la actividad"
+    )
 
     # Métricas y links de verificación
     participantes = models.PositiveIntegerField(default=0, verbose_name="Participantes")

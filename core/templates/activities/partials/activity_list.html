@@ -4,6 +4,7 @@
         <tr>
             <th>Nombre</th>
             <th>Proyecto</th>
+            <th>Área</th>
             <th>Fecha</th>
             <th>Participantes</th>
             <th>Personas alcanzadas</th>
@@ -16,7 +17,12 @@
         <tr class="hover h-16">
             <td class="font-medium">{{ activity.nombre }}</td>
             <td>
-                 <div class="badge badge-celeste">{{ activity.proyecto }} </div>
+                 <div class="badge badge-celeste w-24 justify-center overflow-hidden whitespace-nowrap text-ellipsis">
+                   {{ activity.proyecto }}
+                </div>
+            </td>
+            <td>
+                <div>{{ activity.get_area_display|default:"Sin área" }}</div>
             </td>
             <td>{{ activity.fecha }}</td>
             <td>{{ activity.participantes }}</td>

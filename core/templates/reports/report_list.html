@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-10">
+
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Reportes</h1>
+    </div>
+    <!-- Search input -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+        <div class="w-full sm:w-96">
+            <input type="text" 
+                    name="busqueda" 
+                    placeholder="Buscar reportes..."
+                    value="{{ search }}"
+                    class="w-full px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                    hx-get="{% url 'report_list' %}"
+                    hx-trigger="keyup changed delay:300ms"
+                    hx-target="#report-list"
+                    hx-include="[name='busqueda'],[name='type']">
+        </div>
+
+    <!-- Search and filter section -->
+        <!-- Type filter dropdown -->
+        <select name="type"
+                class="w-full sm:w-48 px-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-transparent"
+                hx-get="{% url 'report_list' %}"
+                hx-trigger="change"
+                hx-target="#report-list"
+                hx-include="[name='busqueda'],[name='type']">
+            <option value="all" {% if report_type == 'all' %}selected{% endif %}>-- Todos --</option>
+            <option value="activities" {% if report_type == 'activities' %}selected{% endif %}>Actividades</option>
+            <option value="events" {% if report_type == 'events' %}selected{% endif %}>Eventos</option>
+            <option value="projects" {% if report_type == 'projects' %}selected{% endif %}>Proyectos</option>
+        </select>
+
+    </div>
+
+    <!-- Reports table container -->
+    <div id="report-list">
+        {% include "reports/partials/report_list.html" %}
+    </div>
+
+</div>
+{% endblock %}

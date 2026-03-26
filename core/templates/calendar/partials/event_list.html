@@ -18,10 +18,10 @@
                 <tbody>
                     {% for event in events %}
                     <tr class="hover h-16">
-                        <td class="font-bold">{{ event.name }}</td>
+                        <td class="font-medium">{{ event.name }}</td>
                         <td>
                             {% if event.proyecto %}
-                                <span class="badge badge-celeste">{{ event.proyecto.name }}</span>
+                                <span class="badge badge-celeste w-24 justify-center overflow-hidden whitespace-nowrap text-ellipsis">{{ event.proyecto.name }}</span>
                             {% else %}
                                 <span class="text-base-content/40">—</span>
                             {% endif %}
