@@ -551,8 +551,13 @@ def report_list(request):
 def export_report_stub(request, object_type, pk):
     """
     Stub endpoint for exporting individual reports.
+    Only superusers can export reports.
     Placeholder for CSV/PDF export functionality.
     """
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para descargar reportes.')
+        return HttpResponse(status=403)
+    
     # Placeholder: In future, implement actual export logic
     # For now, return a simple response or redirect
     messages.info(request, f'Export functionality coming soon for {object_type} #{pk}')

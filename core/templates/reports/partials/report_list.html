@@ -33,6 +33,7 @@
                         </span>
                     </td>
                     <td class="text-right">
+                        {% if request.user.is_superuser %}
                         <button class="btn btn-xs btn-ghost text-primary"
                                 hx-get="{% url 'export_report' report.object_type report.id %}"
                                 title="Descargar {{ report.nombre }}">
@@ -41,6 +42,14 @@
                                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
                         </button>
+                        {% else %}
+                        <span class="text-base-content/40" title="Solo superusuarios pueden descargar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
