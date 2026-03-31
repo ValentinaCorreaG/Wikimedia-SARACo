@@ -1,3 +1,5 @@
+{% load permissions %}
+
 <!-- Lista de Usuarios -->
 <div class="card bg-base-100 shadow-xl">
     <div class="card-body">
@@ -57,7 +59,8 @@
                                        aria-label="Ver perfil de {{ user.username }}">
                                         Ver
                                     </a>
-                                    {% if request.user.is_superuser and user != request.user %}
+                                    {% can_delete request.user as can_delete %}
+                                    {% if can_delete and user != request.user %}
                                     <button type="button"
                                             class="btn btn-xs btn-error btn-outline"
                                             aria-label="Eliminar usuario {{ user.username }}"

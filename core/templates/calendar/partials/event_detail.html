@@ -106,7 +106,9 @@
     <form method="dialog">
         <button type="submit" class="btn btn-ghost">Cerrar</button>
     </form>
-    {% if request.user.is_superuser %}
+    {% load permissions %}
+    {% can_edit request.user as can_edit %}
+    {% if can_edit %}
     <button type="button"
             hx-get="{% url 'edit_event' event.pk %}"
             hx-target="#modal-box-content"

@@ -7,7 +7,9 @@
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold">Usuarios</h1>
         <div class="flex items-center gap-3">
-            {% if request.user.is_superuser %}
+            {% load permissions %}
+            {% can_create request.user as can_create %}
+            {% if can_create %}
                 <button type="button" class="btn btn-primary" onclick="create_user_modal.showModal()">
                     <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -24,7 +26,8 @@
     </div>
 </div>
 
-{% if request.user.is_superuser %}
+{% can_create request.user as can_create %}
+{% if can_create %}
 {% include "users/partials/user_create_modal.html" %}
 {% include "users/partials/user_delete_modal.html" %}
 {% endif %}

@@ -1,3 +1,6 @@
+{% load permissions %}
+
+{% if projects %}
 <div class="overflow-x-auto bg-white rounded-xl shadow">
     <table class="table table-zebra w-full">
         <thead>
@@ -42,7 +45,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
                         </button>
-                        {% if request.user.is_superuser %}
+                        {% can_edit request.user as can_edit %}
+                        {% if can_edit %}
                         <button class="btn btn-xs btn-ghost"
                                 hx-get="{% url 'project_edit' project.pk %}"
                                 hx-target="#modal-box-content"
@@ -76,3 +80,26 @@
         </tbody>
     </table>
 </div>
+
+{% else %}
+<!-- Empty state when no projects and no rows rendered inside table -->
+<div class="text-center py-12 sm:py-16">
+    <svg class="w-20 h-20 sm:w-24 sm:h-24 mx-auto text-primary/30 mb-3 sm:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <h3 class="text-lg sm:text-xl font-semibold text-base-content mb-2">No hay proyectos</h3>
+    <p class="text-base-content/70 mb-4 sm:mb-6 text-sm sm:text-base">Comienza creando tu primer proyecto</p>
+    {% can_create request.user as can_create %}
+    {% if can_create %}
+    <button class="btn btn-primary"
+            hx-get="{% url 'project_create' %}"
+            hx-target="#modal-box-content"
+            hx-swap="innerHTML">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Crear Proyecto
+    </button>
+    {% endif %}
+</div>
+{% endif %}

@@ -1,3 +1,4 @@
+{% load permissions %}
 <div class="overflow-x-auto bg-white rounded-xl shadow">
 <table class="table table-zebra w-full">
     <thead>
@@ -40,7 +41,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
                     </button>
-                    {% if request.user.is_superuser %}
+                    {% can_edit request.user as can_edit %}
+                    {% if can_edit %}
                     <button class="btn btn-xs btn-ghost"
                             hx-get="{% url 'edit_activity' activity.pk %}"
                             hx-target="#modal-box-content"
