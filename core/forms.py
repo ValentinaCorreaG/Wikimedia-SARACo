@@ -15,7 +15,7 @@ class ActivityForm(forms.ModelForm):
     class Meta:
         model = Activity
         fields = [
-            'proyecto', 'nombre', 'fecha', 'descripcion',
+            'proyecto', 'nombre', 'fecha', 'descripcion', 'area',
             'participantes', 'participantes_verificacion',
             'personas_alcanzadas', 'personas_alcanzadas_verificacion',
             'contenidos_creados', 'contenidos_creados_verificacion',
@@ -32,6 +32,7 @@ class ActivityForm(forms.ModelForm):
             'nombre': 'Nombre de la actividad',
             'fecha': 'Fecha de la actividad',
             'descripcion': 'Descripción',
+            'area': 'Área de la actividad',
             'participantes': 'Participantes',
             'participantes_verificacion': 'Links o verificación de participantes',
             'personas_alcanzadas': 'Personas alcanzadas indirectamente',

@@ -1,0 +1,68 @@
+<div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Área</th>
+                <th>Tipo</th>
+                <th class="text-right">Descargar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if reports %}
+                {% for report in reports %}
+                <tr class="hover h-16">
+                    <td class="font-medium">{{ report.nombre }}</td>
+                    <td>
+                        <div>{{ report.area }}</div>
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if report.tipo == 'Actividad' %}badge-info
+                            {% elif report.tipo == 'Proyecto' %}badge-primary
+                            {% else %}badge-warning
+                            {% endif %}
+                        ">
+                            {% if report.tipo == 'Actividad' %}
+                                Actividad
+                            {% elif report.tipo == 'Proyecto' %}
+                                Proyecto
+                            {% else %}
+                                Evento
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td class="text-right">
+                        {% if request.user.is_superuser %}
+                        <button class="btn btn-xs btn-ghost text-primary"
+                                hx-get="{% url 'export_report' report.object_type report.id %}"
+                                title="Descargar {{ report.nombre }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </button>
+                        {% else %}
+                        <span class="text-base-content/40" title="Solo superusuarios pueden descargar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-6 text-base-content/60">
+                        <p class="text-lg">No se encontraron reportes</p>
+                        {% if search %}
+                            <p class="text-sm mt-2">Intenta con otro término de búsqueda</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

@@ -23,5 +23,9 @@ urlpatterns = [
     path('activities/create/', views.create_activity, name='create_activity'),
     path('activities/<int:pk>/', views.activity_detail, name='activity_detail'),
     path('activities/<int:pk>/edit/', views.edit_activity, name='edit_activity'),
-    path('activities/<int:pk>/delete/', views.delete_activity, name='activity_delete')
+    path('activities/<int:pk>/delete/', views.delete_activity, name='activity_delete'),
+
+    # Reports
+    path('reportes/', views.report_list, name='report_list'),
+    path('reportes/exportar/<str:object_type>/<int:pk>/', views.export_report_stub, name='export_report'),
 ]

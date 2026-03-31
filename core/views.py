@@ -453,6 +453,116 @@ def project_create(request):
         'form_action': reverse('project_create'),
     })
 
+
+# -------------------------
+# REPORTS VIEW
+# -------------------------
+def report_list(request):
+    """
+    Unified reports view aggregating Activities, Events, and Projects.
+    Supports filtering by type (activities|events|projects|all) and search.
+    Returns partial template for HTMX requests, full page otherwise.
+    """
+    # Get filter and search parameters
+    report_type = request.GET.get('type', 'all')  # all, activities, events, projects
+    search = request.GET.get('busqueda', '')
+    
+    # Initialize empty report list
+    reports = []
+    
+    # Helper function to normalize report objects
+    def add_activity_reports(activities):
+        for activity in activities:
+            reports.append({
+                'id': activity.id,
+                'nombre': activity.nombre,
+                'area': activity.get_area_display() if activity.area else 'Sin especificar',
+                'tipo': 'Actividad',
+                'object_type': 'activity',
+                'object': activity,
+            })
+    
+    def add_event_reports(events):
+        for event in events:
+            reports.append({
+                'id': event.id,
+                'nombre': event.name,
+                'area': event.responsible_area,
+                'tipo': event.get_activity_type_display() or 'Evento',
+                'object_type': 'event',
+                'object': event,
+            })
+    
+    def add_project_reports(projects):
+        for project in projects:
+            reports.append({
+                'id': project.id,
+                'nombre': project.name,
+                'area': project.get_program_display(),
+                'tipo': 'Proyecto',
+                'object_type': 'project',
+                'object': project,
+            })
+    
+    # Filter by type and search
+    if report_type in ['all', 'activities']:
+        activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+        if search:
+            activities = activities.filter(
+                Q(nombre__icontains=search) |
+                Q(descripcion__icontains=search)
+            )
+        add_activity_reports(activities)
+    
+    if report_type in ['all', 'events']:
+        events = Event.objects.select_related('proyecto').all().order_by('-start_date')
+        if search:
+            events = events.filter(
+                Q(name__icontains=search) |
+                Q(responsible_area__icontains=search) |
+                Q(description__icontains=search)
+            )
+        add_event_reports(events)
+    
+    if report_type in ['all', 'projects']:
+        projects = Project.objects.all().order_by('-start_date')
+        if search:
+            projects = projects.filter(
+                Q(name__icontains=search) |
+                Q(description__icontains=search) |
+                Q(responsible__icontains=search)
+            )
+        add_project_reports(projects)
+    
+    # Sort all reports by nombre
+    reports.sort(key=lambda x: x['nombre'].lower())
+    
+    context = {
+        'reports': reports,
+        'report_type': report_type,
+        'search': search,
+    }
+    
+    if request.htmx:
+        return render(request, 'reports/partials/report_list.html', context)
+    return render(request, 'reports/report_list.html', context)
+
+
+def export_report_stub(request, object_type, pk):
+    """
+    Stub endpoint for exporting individual reports.
+    Only superusers can export reports.
+    Placeholder for CSV/PDF export functionality.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, 'No tienes permisos para descargar reportes.')
+        return HttpResponse(status=403)
+    
+    # Placeholder: In future, implement actual export logic
+    # For now, return a simple response or redirect
+    messages.info(request, f'Export functionality coming soon for {object_type} #{pk}')
+    return HttpResponse(status=204)
+
 def edit_project(request, pk):
     """Edit existing project (modal + HTMX)."""
     project = get_object_or_404(Project, pk=pk)
