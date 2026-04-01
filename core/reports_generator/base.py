@@ -19,15 +19,17 @@ class BaseReportGenerator(ABC):
     # Fields to exclude from automatic extraction
     EXCLUDED_FIELDS = ['id']
     
-    def __init__(self, instance):
+    def __init__(self, instance, include_custom_sheets=True):
         """
         Initialize the generator with a model instance
         
         Args:
             instance: Django model instance to generate report from
+            include_custom_sheets: Whether to include custom sheets (default: True)
         """
         self.instance = instance
         self.df = None
+        self.include_custom_sheets = include_custom_sheets
     
     def get_field_value(self, field) -> Any:
         """
@@ -249,20 +251,44 @@ class BaseReportGenerator(ABC):
         
         return f"{prefix}_{safe_name}_{date_str}.xlsx"
     
-    def apply_formatting(self, writer):
+    def add_custom_sheets(self, writer):
         """
-        Apply Excel formatting to the workbook.
+        Hook for subclasses to add additional sheets to the Excel workbook.
+        Called after the main 'Datos' sheet is created and formatted.
+        
+        Args:
+            writer: pandas ExcelWriter object
+            
+        Example:
+            def add_custom_sheets(self, writer):
+                # Add a sheet with related data
+                related_df = pd.DataFrame(self._get_related_data())
+                related_df.to_excel(writer, index=False, sheet_name='Related Items')
+        """
+        # Default implementation - does nothing
+        # Subclasses can override to add custom sheets
+        pass
+    
+    def apply_formatting(self, writer, sheet_name='Datos'):
+        """
+        Apply Excel formatting to a specific sheet in the workbook.
         Provides a clean, professional default formatting.
         Can be overridden by subclasses for custom formatting.
         
         Args:
             writer: pandas ExcelWriter object
+            sheet_name: Name of the sheet to format (default: 'Datos')
         """
         from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
         from openpyxl.utils import get_column_letter
         
         workbook = writer.book
-        worksheet = writer.sheets['Datos']
+        
+        # Check if sheet exists
+        if sheet_name not in writer.sheets:
+            return
+            
+        worksheet = writer.sheets[sheet_name]
         
         # Define default color scheme
         header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
@@ -336,10 +362,15 @@ class BaseReportGenerator(ABC):
         
         # Write to Excel
         with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            # Write main data sheet
             self.df.to_excel(writer, index=False, sheet_name='Datos')
             
-            # Apply custom formatting if implemented
-            self.apply_formatting(writer)
+            # Apply formatting to main sheet
+            self.apply_formatting(writer, sheet_name='Datos')
+            
+            # Allow subclasses to add custom sheets (only if enabled)
+            if self.include_custom_sheets:
+                self.add_custom_sheets(writer)
         
         # Reset buffer position to beginning
         buffer.seek(0)
@@ -360,8 +391,15 @@ class BaseReportGenerator(ABC):
             raise ValueError("prepare_data() must set self.df")
         
         with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
+            # Write main data sheet
             self.df.to_excel(writer, index=False, sheet_name='Datos')
-            self.apply_formatting(writer)
+            
+            # Apply formatting to main sheet
+            self.apply_formatting(writer, sheet_name='Datos')
+            
+            # Allow subclasses to add custom sheets (only if enabled)
+            if self.include_custom_sheets:
+                self.add_custom_sheets(writer)
     
     def get_dataframe(self) -> pd.DataFrame:
         """
