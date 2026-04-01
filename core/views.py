@@ -6,7 +6,7 @@ Supports both full-page and HTMX partial responses.
 """
 import json
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
@@ -17,6 +17,12 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .services import OutreachMetricsService
 from .models import Event, Project, Activity
+from .decorators import (
+    require_create_permission,
+    require_edit_permission,
+    require_delete_permission,
+    require_authenticated,
+)
 
 # -------------------------
 # ACTIVITY VIEWS (CRUD)
@@ -46,11 +52,9 @@ def activity_detail(request, pk):
     activity = get_object_or_404(Activity, pk=pk)
     return render(request, 'activities/partials/activity_detail.html', {'activity': activity})
 
+@require_create_permission
 def create_activity(request):
     """Create a new activity. Only superusers can create."""
-    if not request.user.is_superuser:
-        messages.error(request, 'No tienes permisos para crear actividades.')
-        return redirect('activity_list')
     if request.method == 'POST':
         form = ActivityForm(request.POST)
         if form.is_valid():
@@ -70,7 +74,6 @@ def create_activity(request):
     else:
         form = ActivityForm()
     if request.htmx:
-        from django.urls import reverse
         return render(request, 'activities/partials/activity_form.html', {
             'form': form,
             'title': 'Crear Actividad',
@@ -83,12 +86,10 @@ def create_activity(request):
         'form_action': reverse('create_activity'),
     })
 
+@require_edit_permission
 def edit_activity(request, pk):
     """Edit an existing activity. Only superusers can edit."""
     activity = get_object_or_404(Activity, pk=pk)
-    if not request.user.is_superuser:
-        messages.error(request, 'No tienes permisos para editar actividades.')
-        return redirect('activity_list')
     if request.method == 'POST':
         form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
@@ -109,7 +110,6 @@ def edit_activity(request, pk):
     else:
         form = ActivityForm(instance=activity)
     if request.htmx:
-        from django.urls import reverse
         return render(request, 'activities/partials/activity_form.html', {
             'form': form,
             'activity': activity,
@@ -124,12 +124,10 @@ def edit_activity(request, pk):
         'form_action': reverse('edit_activity', args=[activity.pk]),
     })
 
+@require_delete_permission
 def delete_activity(request, pk):
     """Delete an activity. Only superusers can delete."""
     activity = get_object_or_404(Activity, pk=pk)
-    if not request.user.is_superuser:
-        messages.error(request, 'No tienes permisos para eliminar actividades.')
-        return redirect('activity_list')
     if request.method == 'POST':
         activity_name = activity.nombre
         activity.delete()
@@ -257,9 +255,9 @@ def event_list(request):
         return render(request, 'calendar/partials/event_list.html', {'events': events})
     return render(request, 'calendar/event_list.html', {'events': events, 'projects': projects})
 
-@login_required
+@require_create_permission
 def create_event(request):
-    """Create a new event. On success, redirects to event list or returns HTMX trigger."""
+    """Create a new event. Only superusers can create."""
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
@@ -289,12 +287,10 @@ def create_event(request):
     return render(request, 'calendar/partials/event_form.html', {'form': form, 'title': 'Crear Evento'})
 
 
-@login_required
+@require_edit_permission
 def edit_event(request, pk):
-    """Edit an existing event by primary key. Supports full page and HTMX."""
+    """Edit an existing event. Only superusers can edit."""
     event = get_object_or_404(Event, pk=pk)
-    if not request.user.is_superuser:
-        return HttpResponseForbidden("You don't have permission to create events.")
 
     if request.method == 'POST':
         form = EventForm(request.POST, instance=event)
@@ -327,12 +323,10 @@ def edit_event(request, pk):
     return render(request, 'calendar/partials/event_form.html', {'form': form, 'event': event, 'title': 'Editar Evento'})
 
 
+@require_delete_permission
 def delete_event(request, pk):
-    """Delete an event after confirmation. Returns event list partial for HTMX or redirect."""
+    """Delete an event. Only superusers can delete."""
     event = get_object_or_404(Event, pk=pk)
-
-    if not request.user.is_superuser:
-        return HttpResponseForbidden("You don't have permission to create events.")
 
     if request.method == 'POST':
         event_name = event.name
@@ -424,7 +418,9 @@ def project_detail(request, pk):
         return render(request, 'projects/partials/project_detail.html', {'project': project})
     return render(request, 'projects/partials/project_detail.html', {'project': project})
 
+@require_create_permission
 def project_create(request):
+    """Create a new project. Only superusers can create."""
     if request.method == 'POST':
         form = ProjectForm(request.POST)
         if form.is_valid():
@@ -446,7 +442,6 @@ def project_create(request):
     else:
         form = ProjectForm()
 
-    from django.urls import reverse
     return render(request, 'projects/partials/project_form.html', {
         'form': form,
         'title': 'Nuevo Proyecto',
@@ -454,9 +449,45 @@ def project_create(request):
     })
 
 
+@require_edit_permission
+def edit_project(request, pk):
+    """Edit existing project. Only superusers can edit."""
+    project = get_object_or_404(Project, pk=pk)
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+            messages.success(request, f'Proyecto "{project.name}" actualizado exitosamente.')
+
+            if request.htmx:
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({
+                    'modalClose': {
+                        'modalId': 'modal-container',
+                        'contentId': 'modal-box-content',
+                        'reload': True
+                    }
+                })
+                return response
+
+            return redirect('project_list')
+    else:
+        form = ProjectForm(instance=project)
+
+    return render(request, 'projects/partials/project_form.html', {
+        'form': form,
+        'project': project,
+        'title': 'Editar Proyecto',
+        'action': 'editar',
+        'form_action': reverse('project_edit', args=[project.pk]),
+    })
+
+
 # -------------------------
 # REPORTS VIEW
 # -------------------------
+@require_authenticated
 def report_list(request):
     """
     Unified reports view aggregating Activities, Events, and Projects.
@@ -548,58 +579,22 @@ def report_list(request):
     return render(request, 'reports/report_list.html', context)
 
 
+@require_delete_permission
 def export_report_stub(request, object_type, pk):
     """
     Stub endpoint for exporting individual reports.
     Only superusers can export reports.
     Placeholder for CSV/PDF export functionality.
     """
-    if not request.user.is_superuser:
-        messages.error(request, 'No tienes permisos para descargar reportes.')
-        return HttpResponse(status=403)
-    
     # Placeholder: In future, implement actual export logic
     # For now, return a simple response or redirect
     messages.info(request, f'Export functionality coming soon for {object_type} #{pk}')
     return HttpResponse(status=204)
 
-def edit_project(request, pk):
-    """Edit existing project (modal + HTMX)."""
-    project = get_object_or_404(Project, pk=pk)
 
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            project = form.save()
-            messages.success(request, f'Proyecto "{project.name}" actualizado exitosamente.')
-
-            if request.htmx:
-                response = HttpResponse(status=204)
-                response['HX-Trigger'] = json.dumps({
-                    'modalClose': {
-                        'modalId': 'modal-container',
-                        'contentId': 'modal-box-content',
-                        'reload': True
-                    }
-                })
-                return response
-
-            return redirect('project_list')
-    else:
-        form = ProjectForm(instance=project)
-
-    from django.urls import reverse
-    return render(request, 'projects/partials/project_form.html', {
-        'form': form,
-        'project': project,
-        'title': 'Editar Proyecto',
-        'action': 'editar',
-        'form_action': reverse('project_edit', args=[project.pk]),
-    })
-
-
+@require_delete_permission
 def delete_project(request, pk):
-    """Delete project with modal confirmation."""
+    """Delete project with modal confirmation. Only superusers can delete."""
     project = get_object_or_404(Project, pk=pk)
 
     if request.method == 'POST':

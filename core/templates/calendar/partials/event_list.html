@@ -1,4 +1,5 @@
 <!-- Event list partial: used by event list page and HTMX -->
+{% load permissions %}
 
 {% if events %}
 <div class="overflow-x-auto bg-white rounded-xl shadow">
@@ -50,7 +51,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </button>
-                                {% if request.user.is_superuser %}
+                                {% can_edit request.user as can_edit %}
+                                {% if can_edit %}
                                 <button class="btn btn-sm btn-ghost"
                                         hx-get="{% url 'edit_event' event.pk %}"
                                         hx-target="#modal-box-content"
@@ -91,6 +93,8 @@
     </svg>
     <h3 class="text-lg sm:text-xl font-semibold text-base-content mb-2">No hay eventos</h3>
     <p class="text-base-content/70 mb-4 sm:mb-6 text-sm sm:text-base">Comienza creando tu primer evento</p>
+    {% can_create request.user as can_create %}
+    {% if can_create %}
     <button class="btn btn-primary"
             hx-get="{% url 'create_event' %}"
             hx-target="#modal-box-content"
@@ -100,5 +104,6 @@
         </svg>
         Crear Evento
     </button>
+    {% endif %}
 </div>
 {% endif %}

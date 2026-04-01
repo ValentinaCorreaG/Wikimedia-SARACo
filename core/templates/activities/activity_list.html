@@ -6,7 +6,9 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Gestor de Actividades</h1>
 
-        {% if user.is_superuser %}
+        {% load permissions %}
+        {% can_create request.user as can_create %}
+        {% if can_create %}
         <button class="btn btn-primary w-40"
                 hx-get="{% url 'create_activity' %}"
                 hx-target="#modal-box-content"

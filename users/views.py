@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
+from core.decorators import require_superuser
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.decorators.http import require_http_methods
@@ -172,13 +173,12 @@ def profile_edit_view(request):
     })
 
 
-@login_required
-@permission_required("auth.view_user", raise_exception=True)
+@require_superuser
 def user_list_view(request):
     """
     Display a list of all users.
     
-    Requires view_user permission.
+    Only superusers can access this view.
     Supports HTMX for dynamic loading.
 
     Args:
@@ -200,7 +200,7 @@ def user_list_view(request):
             
             if request.htmx:
                 users = User.objects.select_related('profile').order_by('-is_staff', 'username')
-                response = render(request, 'users/partials/user_table.html', {'users': users, 'can_edit': request.user.is_staff})
+                response = render(request, 'users/partials/user_table.html', {'users': users, 'can_edit': request.user.is_superuser})
                 response['HX-Retarget'] = '#user-list-content'
                 response['HX-Reswap'] = 'innerHTML'
                 response['HX-Trigger'] = json.dumps({
@@ -227,7 +227,7 @@ def user_list_view(request):
     
     context = {
         'users': users,
-        'can_edit': request.user.is_staff,
+        'can_edit': request.user.is_superuser,
         'create_user_form': create_user_form,
     }
     
@@ -235,7 +235,7 @@ def user_list_view(request):
     return render(request, template, context)
 
 
-@login_required
+@require_superuser
 @require_http_methods(["DELETE"])
 def user_delete_view(request, user_id):
     """
@@ -260,7 +260,7 @@ def user_delete_view(request, user_id):
         messages.error(request, _("You cannot delete your own account."))
         if request.htmx:
             users = User.objects.select_related('profile').order_by('-is_staff', 'username')
-            return render(request, 'users/partials/user_table.html', {'users': users})
+            return render(request, 'users/partials/user_table.html', {'users': users, 'can_edit': request.user.is_superuser})
         return redirect("users:user_list")
     
     username = user_to_delete.username
@@ -271,6 +271,28 @@ def user_delete_view(request, user_id):
     
     if request.htmx:
         users = User.objects.select_related('profile').order_by('-is_staff', 'username')
-        return render(request, 'users/partials/user_table.html', {'users': users})
+        return render(request, 'users/partials/user_table.html', {'users': users, 'can_edit': request.user.is_superuser})
     
     return redirect("users:user_list")
+
+
+def oauth_error(request):
+    """
+    Handle OAuth authentication errors.
+    
+    When OAuth login fails (wrong user, already used token, etc.),
+    render the access_denied page with a 403 status code.
+    
+    Args:
+        request: The HTTP request object.
+        
+    Returns:
+        Rendered access_denied page with 403 status.
+    """
+    error_type = request.GET.get('error', 'unknown')
+    error_code = request.GET.get('code', '')
+    
+    logger.warning(f"OAuth error: {error_type} - {error_code} from IP: {request.META.get('REMOTE_ADDR')}")
+    messages.error(request, _("La autenticación OAuth falló. Por favor, intenta de nuevo."))
+    
+    return render(request, 'users/access_denied.html', status=403)

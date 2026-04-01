@@ -10,6 +10,7 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("login/oauth/", views.login_oauth, name="login_oauth"),
     path("logout/", views.logout_view, name="logout"),
+    path("oauth/error/", views.oauth_error, name="oauth_error"),
     
     # Profile management
     path("profile/", views.profile_view, name="profile"),

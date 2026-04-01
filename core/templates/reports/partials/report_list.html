@@ -33,7 +33,9 @@
                         </span>
                     </td>
                     <td class="text-right">
-                        {% if request.user.is_superuser %}
+                        {% load permissions %}
+                        {% can_delete request.user as can_delete %}
+                        {% if can_delete %}
                         <button class="btn btn-xs btn-ghost text-primary"
                                 hx-get="{% url 'export_report' report.object_type report.id %}"
                                 title="Descargar {{ report.nombre }}">

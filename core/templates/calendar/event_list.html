@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load permissions %}
 
 {% block title %}Lista de Eventos{% endblock %}
 
@@ -9,7 +10,8 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Gestor de Eventos </h1>
 
-        {% if user.is_superuser %}
+        {% can_create request.user as can_create %}
+        {% if can_create %}
         <button class="btn btn-primary w-40"
                 hx-get="{% url 'create_event' %}"
                 hx-target="#modal-box-content"

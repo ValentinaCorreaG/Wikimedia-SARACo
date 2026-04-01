@@ -77,8 +77,19 @@ class UserCreationByRoleForm(forms.Form):
             last_name=self.cleaned_data["last_name"],
         )
         user.set_unusable_password()
-        user.is_staff = True
-        user.is_superuser = role == "superuser"
+        
+        # Assign permissions based on role
+        if role == "superuser":
+            user.is_superuser = True
+            user.is_staff = True
+        elif role == "staff":
+            user.is_superuser = False
+            user.is_staff = True
+        else:
+            # Visitor/Anonymous (no special permissions)
+            user.is_superuser = False
+            user.is_staff = False
+        
         user.save()
         
         # Set the profile's professional_wiki_handle to match the username
