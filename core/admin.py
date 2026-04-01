@@ -4,12 +4,12 @@ from .models import Event, Activity
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
     list_display = [
-        'nombre', 'proyecto', 'fecha', 'participantes', 'personas_alcanzadas', 'contenidos_creados',
-        'recursos_educativos_abiertos', 'productos', 'instituciones_participantes',
-        'alianzas_estrategicas', 'historias', 'sostenibilidad', 'numero_editores'
+        'name', 'project', 'date', 'participants', 'reached_people', 'created_content',
+        'open_educational_resources', 'products', 'participating_institutions',
+        'strategic_partnerships', 'stories', 'sustainability', 'editor_count'
     ]
-    list_filter = ['fecha', 'proyecto']
-    search_fields = ['nombre', 'descripcion', 'proyecto__name']
+    list_filter = ['date', 'project']
+    search_fields = ['name', 'description', 'project__name']
 
 
 @admin.register(Event)

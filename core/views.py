@@ -29,19 +29,19 @@ from .decorators import (
 # -------------------------
 def activity_list(request):
     """List all activities with search and project filter support."""
-    activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+    activities = Activity.objects.select_related('project').all().order_by('-date')
     projects = Project.objects.all().order_by('name')
     search = request.GET.get('busqueda', '')
     project_filter = request.GET.get('proyecto', '')
     
     if search:
         activities = activities.filter(
-            Q(nombre__icontains=search) |
-            Q(descripcion__icontains=search)
+            Q(name__icontains=search) |
+            Q(description__icontains=search)
         )
     
     if project_filter:
-        activities = activities.filter(proyecto_id=project_filter)
+        activities = activities.filter(project_id=project_filter)
     
     if request.htmx:
         return render(request, 'activities/partials/activity_list.html', {'activities': activities})
@@ -59,7 +59,7 @@ def create_activity(request):
         form = ActivityForm(request.POST)
         if form.is_valid():
             activity = form.save()
-            messages.success(request, f'Actividad "{activity.nombre}" creada exitosamente.')
+            messages.success(request, f'Actividad "{activity.name}" creada exitosamente.')
             if request.htmx:
                 response = HttpResponse(status=204)
                 response['HX-Trigger'] = json.dumps({
@@ -94,9 +94,9 @@ def edit_activity(request, pk):
         form = ActivityForm(request.POST, instance=activity)
         if form.is_valid():
             activity = form.save()
-            messages.success(request, f'Actividad "{activity.nombre}" actualizada exitosamente.')
+            messages.success(request, f'Actividad "{activity.name}" actualizada exitosamente.')
             if request.htmx:
-                activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+                activities = Activity.objects.select_related('project').all().order_by('-date')
                 response = render(request, 'activities/partials/activity_list.html', {'activities': activities})
                 response['HX-Trigger'] = json.dumps({
                     'modalClose': {
@@ -129,11 +129,11 @@ def delete_activity(request, pk):
     """Delete an activity. Only superusers can delete."""
     activity = get_object_or_404(Activity, pk=pk)
     if request.method == 'POST':
-        activity_name = activity.nombre
+        activity_name = activity.name
         activity.delete()
         messages.success(request, f'Actividad "{activity_name}" eliminada exitosamente.')
         if request.htmx:
-            activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+            activities = Activity.objects.select_related('project').all().order_by('-date')
             response = render(request, 'activities/partials/activity_list.html', {'activities': activities})
             response['HX-Trigger'] = json.dumps({
                 'modalClose': {
@@ -506,7 +506,7 @@ def report_list(request):
         for activity in activities:
             reports.append({
                 'id': activity.id,
-                'nombre': activity.nombre,
+                'nombre': activity.name,
                 'area': activity.get_area_display() if activity.area else 'Sin especificar',
                 'tipo': 'Actividad',
                 'object_type': 'activity',

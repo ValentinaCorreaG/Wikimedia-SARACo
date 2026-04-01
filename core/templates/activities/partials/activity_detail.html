@@ -1,6 +1,6 @@
 <!-- Activity title -->
 <div class="mb-6">
-    <h4 class="text-2xl font-bold text-base-content">{{ activity.nombre }}</h4>
+    <h4 class="text-2xl font-bold text-base-content">{{ activity.name }}</h4>
 </div>
 
 <!-- Main info -->
@@ -15,7 +15,7 @@
                     </svg>
                     <span class="font-semibold">Proyecto</span>
                 </div>
-                <p class="font-medium ml-7">{{ activity.proyecto }}</p>
+                <p class="font-medium ml-7">{{ activity.project }}</p>
             </div>
             <div>
                 <div class="flex items-center text-primary mb-2">
@@ -24,16 +24,16 @@
                     </svg>
                     <span class="font-semibold">Fecha</span>
                 </div>
-                <p class="font-medium ml-7">{{ activity.fecha|date:"d/m/Y" }}</p>
+                <p class="font-medium ml-7">{{ activity.date|date:"d/m/Y" }}</p>
             </div>
         </div>
     </div>
 
     <!-- Description -->
-    {% if activity.descripcion %}
+    {% if activity.description %}
     <div class="bg-base-200 rounded-lg p-4">
         <p class="text-sm opacity-70 mb-2 font-semibold">Descripción</p>
-        <p>{{ activity.descripcion }}</p>
+        <p>{{ activity.description }}</p>
     </div>
     {% endif %}
 
@@ -49,90 +49,90 @@
             <!-- Participantes -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Participantes</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.participantes }}</p>
-                {% if activity.participantes_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.participantes_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.participants }}</p>
+                {% if activity.participants_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.participants_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Personas alcanzadas -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Personas alcanzadas</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.personas_alcanzadas }}</p>
-                {% if activity.personas_alcanzadas_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.personas_alcanzadas_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.reached_people }}</p>
+                {% if activity.reached_people_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.reached_people_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Contenidos creados -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Contenidos creados</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.contenidos_creados }}</p>
-                {% if activity.contenidos_creados_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.contenidos_creados_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.created_content }}</p>
+                {% if activity.created_content_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.created_content_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Recursos educativos -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Recursos abiertos</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.recursos_educativos_abiertos }}</p>
-                {% if activity.recursos_educativos_abiertos_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.recursos_educativos_abiertos_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.open_educational_resources }}</p>
+                {% if activity.open_educational_resources_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.open_educational_resources_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Productos -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Productos</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.productos }}</p>
-                {% if activity.productos_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.productos_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.products }}</p>
+                {% if activity.products_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.products_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Instituciones participantes -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Instituciones</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.instituciones_participantes }}</p>
-                {% if activity.instituciones_participantes_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.instituciones_participantes_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.participating_institutions }}</p>
+                {% if activity.participating_institutions_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.participating_institutions_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Alianzas estratégicas -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Alianzas</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.alianzas_estrategicas }}</p>
-                {% if activity.alianzas_estrategicas_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.alianzas_estrategicas_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.strategic_partnerships }}</p>
+                {% if activity.strategic_partnerships_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.strategic_partnerships_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Historias -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Historias</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.historias }}</p>
-                {% if activity.historias_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.historias_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.stories }}</p>
+                {% if activity.stories_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.stories_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Sostenibilidad -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Sostenibilidad</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.sostenibilidad }}</p>
-                {% if activity.sostenibilidad_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.sostenibilidad_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.sustainability }}</p>
+                {% if activity.sustainability_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.sustainability_verification }}</p>
                 {% endif %}
             </div>
 
             <!-- Número de editores -->
             <div class="bg-base-100 rounded p-3">
                 <p class="text-sm opacity-70 font-semibold">Editores</p>
-                <p class="text-2xl font-bold text-primary">{{ activity.numero_editores }}</p>
-                {% if activity.numero_editores_verificacion %}
-                <p class="text-xs opacity-60 mt-1">{{ activity.numero_editores_verificacion }}</p>
+                <p class="text-2xl font-bold text-primary">{{ activity.editor_count }}</p>
+                {% if activity.editor_count_verification %}
+                <p class="text-xs opacity-60 mt-1">{{ activity.editor_count_verification }}</p>
                 {% endif %}
             </div>
         </div>
