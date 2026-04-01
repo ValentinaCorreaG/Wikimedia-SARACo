@@ -3,7 +3,6 @@ reports/generators/activity.py
 Activity-specific report generator
 """
 import pandas as pd
-from datetime import datetime
 from .base import BaseReportGenerator
 
 
