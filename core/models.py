@@ -47,7 +47,7 @@ class Project(models.Model):
 class Activity(models.Model):
     """
     Activity record associated with a project, including metrics and verification links.
-    Field names in Spanish, code and comments in English.
+    Field names in English, labels in Spanish for the user interface.
     """
     
     PROGRAM_CHOICES = [
@@ -55,10 +55,10 @@ class Activity(models.Model):
         ('TC', 'Tecnologías y comunidades'),
     ]
     
-    proyecto = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='activities', verbose_name="Proyecto")
-    nombre = models.CharField(max_length=200, verbose_name="Nombre de la actividad")
-    fecha = models.DateField(verbose_name="Fecha de la actividad")
-    descripcion = models.TextField(blank=True, verbose_name="Descripción")
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='activities', verbose_name="Proyecto")
+    name = models.CharField(max_length=200, verbose_name="Nombre de la actividad")
+    date = models.DateField(verbose_name="Fecha de la actividad")
+    description = models.TextField(blank=True, verbose_name="Descripción")
     area = models.CharField(
         max_length=3,
         choices=PROGRAM_CHOICES,
@@ -67,35 +67,35 @@ class Activity(models.Model):
     )
 
     # Métricas y links de verificación
-    participantes = models.PositiveIntegerField(default=0, verbose_name="Participantes")
-    participantes_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de participantes")
+    participants = models.PositiveIntegerField(default=0, verbose_name="Participantes")
+    participants_verification = models.TextField(blank=True, verbose_name="Links o verificación de participantes")
 
-    personas_alcanzadas = models.PositiveIntegerField(default=0, verbose_name="Personas alcanzadas indirectamente")
-    personas_alcanzadas_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de personas alcanzadas")
+    reached_people = models.PositiveIntegerField(default=0, verbose_name="Personas alcanzadas indirectamente")
+    reached_people_verification = models.TextField(blank=True, verbose_name="Links o verificación de personas alcanzadas")
 
-    contenidos_creados = models.PositiveIntegerField(default=0, verbose_name="Contenidos creados")
-    contenidos_creados_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de contenidos creados")
+    created_content = models.PositiveIntegerField(default=0, verbose_name="Contenidos creados")
+    created_content_verification = models.TextField(blank=True, verbose_name="Links o verificación de contenidos creados")
 
-    recursos_educativos_abiertos = models.PositiveIntegerField(default=0, verbose_name="Recursos educativos abiertos")
-    recursos_educativos_abiertos_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de recursos educativos abiertos")
+    open_educational_resources = models.PositiveIntegerField(default=0, verbose_name="Recursos educativos abiertos")
+    open_educational_resources_verification = models.TextField(blank=True, verbose_name="Links o verificación de recursos educativos abiertos")
 
-    productos = models.PositiveIntegerField(default=0, verbose_name="Productos")
-    productos_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de productos")
+    products = models.PositiveIntegerField(default=0, verbose_name="Productos")
+    products_verification = models.TextField(blank=True, verbose_name="Links o verificación de productos")
 
-    instituciones_participantes = models.PositiveIntegerField(default=0, verbose_name="Instituciones participantes")
-    instituciones_participantes_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de instituciones participantes")
+    participating_institutions = models.PositiveIntegerField(default=0, verbose_name="Instituciones participantes")
+    participating_institutions_verification = models.TextField(blank=True, verbose_name="Links o verificación de instituciones participantes")
 
-    alianzas_estrategicas = models.PositiveIntegerField(default=0, verbose_name="Alianzas estratégicas")
-    alianzas_estrategicas_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de alianzas estratégicas")
+    strategic_partnerships = models.PositiveIntegerField(default=0, verbose_name="Alianzas estratégicas")
+    strategic_partnerships_verification = models.TextField(blank=True, verbose_name="Links o verificación de alianzas estratégicas")
 
-    historias = models.PositiveIntegerField(default=0, verbose_name="Historias sobre soluciones y desafíos")
-    historias_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de historias")
+    stories = models.PositiveIntegerField(default=0, verbose_name="Historias sobre soluciones y desafíos")
+    stories_verification = models.TextField(blank=True, verbose_name="Links o verificación de historias")
 
-    sostenibilidad = models.PositiveIntegerField(default=0, verbose_name="Sostenibilidad")
-    sostenibilidad_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de sostenibilidad")
+    sustainability = models.PositiveIntegerField(default=0, verbose_name="Sostenibilidad")
+    sustainability_verification = models.TextField(blank=True, verbose_name="Links o verificación de sostenibilidad")
 
-    numero_editores = models.PositiveIntegerField(default=0, verbose_name="Número total de editores")
-    numero_editores_verificacion = models.TextField(blank=True, verbose_name="Links o verificación de editores")
+    editor_count = models.PositiveIntegerField(default=0, verbose_name="Número total de editores")
+    editor_count_verification = models.TextField(blank=True, verbose_name="Links o verificación de editores")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -103,10 +103,10 @@ class Activity(models.Model):
     class Meta:
         verbose_name = "Actividad"
         verbose_name_plural = "Actividades"
-        ordering = ['-fecha']
+        ordering = ['-date']
 
     def __str__(self):
-        return f"{self.nombre} ({self.fecha})"
+        return f"{self.name} ({self.date})"
 
 class Event(models.Model):
     """

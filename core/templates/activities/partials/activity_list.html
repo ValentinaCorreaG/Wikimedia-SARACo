@@ -16,26 +16,26 @@
     <tbody>
         {% for activity in activities %}
         <tr class="hover h-16">
-            <td class="font-medium">{{ activity.nombre }}</td>
+            <td class="font-medium">{{ activity.name }}</td>
             <td>
                  <div class="badge badge-celeste w-24 justify-center overflow-hidden whitespace-nowrap text-ellipsis">
-                   {{ activity.proyecto }}
+                   {{ activity.project }}
                 </div>
             </td>
             <td>
                 <div>{{ activity.get_area_display|default:"Sin área" }}</div>
             </td>
-            <td>{{ activity.fecha }}</td>
-            <td>{{ activity.participantes }}</td>
-            <td>{{ activity.personas_alcanzadas }}</td>
-            <td>{{ activity.contenidos_creados }}</td>
+            <td>{{ activity.date }}</td>
+            <td>{{ activity.participants }}</td>
+            <td>{{ activity.reached_people }}</td>
+            <td>{{ activity.created_content }}</td>
             <td class="text-right space-x-2">
                 <div class="flex gap-1 flex-wrap justify-end">
                     <button class="btn btn-xs btn-ghost"
                             hx-get="{% url 'activity_detail' activity.pk %}"
                             hx-target="#modal-box-content"
                             onclick="document.getElementById('modal-container').showModal()"
-                            aria-label="Ver {{ activity.nombre }}">
+                            aria-label="Ver {{ activity.name }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -47,7 +47,7 @@
                             hx-get="{% url 'edit_activity' activity.pk %}"
                             hx-target="#modal-box-content"
                             onclick="document.getElementById('modal-container').showModal()"
-                            aria-label="Editar {{ activity.nombre }}">
+                            aria-label="Editar {{ activity.name }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
@@ -56,7 +56,7 @@
                             hx-get="{% url 'activity_delete' activity.pk %}"
                             hx-target="#modal-box-content"
                             onclick="document.getElementById('modal-container').showModal()"
-                            aria-label="Eliminar {{ activity.nombre }}">
+                            aria-label="Eliminar {{ activity.name }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/>
                         </svg>
