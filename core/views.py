@@ -6,17 +6,20 @@ Supports both full-page and HTMX partial responses.
 """
 import json
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
 from django.contrib import messages
 from django.contrib.auth import login
 from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .services import OutreachMetricsService
 from .models import Event, Project, Activity
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
+
+from .reports_generator.factory import ReportGeneratorFactory
 from .decorators import (
     require_create_permission,
     require_edit_permission,
@@ -577,6 +580,64 @@ def report_list(request):
     if request.htmx:
         return render(request, 'reports/partials/report_list.html', context)
     return render(request, 'reports/report_list.html', context)
+
+@require_authenticated
+@require_http_methods(["GET"])
+def download_report(request, report_type, instance_id):
+    """
+    Unified view to download Excel report for any model type.
+    
+    Args:
+        request: HttpRequest object
+        report_type: Type of report ('activity', 'event', 'project')
+        instance_id: ID of the instance to generate report for
+        
+    Returns:
+        HttpResponse with Excel file
+        
+    Raises:
+        Http404: If instance doesn't exist or report type is invalid
+    """
+    try:
+        # Create the appropriate generator using the factory
+        generator = ReportGeneratorFactory.create(report_type, instance_id)
+        
+        # Optional: Add permission checks here
+        # if not request.user.has_perm('your_app.view_activity'):
+        #     raise PermissionDenied("No tienes permiso para descargar este reporte")
+        
+        # Validate the instance
+        is_valid, error_msg = generator.validate_instance()
+        if not is_valid:
+            raise Http404(f"Error al generar reporte: {error_msg}")
+        
+        # Generate the Excel file
+        excel_file = generator.generate_excel()
+        filename = generator.get_filename()
+        
+        # Create HTTP response
+        response = HttpResponse(
+            excel_file.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        return response
+        
+    except ValueError as e:
+        # Invalid report type
+        raise Http404(f"Tipo de reporte inválido: {str(e)}")
+        
+    except ObjectDoesNotExist as e:
+        # Instance not found
+        raise Http404(str(e))
+        
+    except Exception as e:
+        # Log the error in production
+        # logger.error(f"Error generating report: {str(e)}", exc_info=True)
+        raise Http404(f"Error al generar el reporte: {str(e)}")
+
+
 
 
 @require_delete_permission

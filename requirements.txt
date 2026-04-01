@@ -3,3 +3,5 @@ django-tailwind[reload]
 django-htmx
 django-environ
 social-auth-app-django>=5.4.0
+pandas
+openpyxl

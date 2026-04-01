@@ -27,5 +27,9 @@ urlpatterns = [
 
     # Reports
     path('reportes/', views.report_list, name='report_list'),
-    path('reportes/exportar/<str:object_type>/<int:pk>/', views.export_report_stub, name='export_report'),
+    path(
+        'download/<str:report_type>/<int:instance_id>/',
+        views.download_report,
+        name='download_report'
+    ),
 ]
