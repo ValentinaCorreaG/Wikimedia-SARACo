@@ -35,10 +35,10 @@ class ActivityReportGenerator(BaseReportGenerator):
             return is_valid, error_msg
         
         # Add Activity-specific validation
-        if not self.instance.proyecto:
+        if not self.instance.project:
             return False, "La actividad debe estar asociada a un proyecto"
         
-        if not self.instance.nombre:
+        if not self.instance.name:
             return False, "La actividad debe tener un nombre"
         
         return True, None
