@@ -4,8 +4,8 @@ Factory for creating the appropriate report generator based on type
 """
 from django.core.exceptions import ObjectDoesNotExist
 from .activity import ActivityReportGenerator
+from .project import ProjectReportGenerator
 # from .generators.event import EventReportGenerator
-# from .generators.project import ProjectReportGenerator
 
 
 class ReportGeneratorFactory:
@@ -21,15 +21,15 @@ class ReportGeneratorFactory:
             'generator': ActivityReportGenerator,
             'model_path': 'core.models.Activity',  # Update with your app name
         },
+        'project': {
+            'model': None,
+            'generator': ProjectReportGenerator,
+            'model_path': 'core.models.Project',
+        },
         # 'event': {
         #     'model': None,
         #     'generator': EventReportGenerator,
         #     'model_path': 'core.models.Event',
-        # },
-        # 'project': {
-        #     'model': None,
-        #     'generator': ProjectReportGenerator,
-        #     'model_path': 'core.models.Project',
         # },
     }
     
@@ -62,13 +62,14 @@ class ReportGeneratorFactory:
         return config['model']
     
     @classmethod
-    def create(cls, report_type, instance_id):
+    def create(cls, report_type, instance_id, include_custom_sheets=True):
         """
         Create and return the appropriate report generator.
         
         Args:
             report_type: Type of report ('activity', 'event', 'project')
             instance_id: ID of the instance to generate report for
+            include_custom_sheets: Whether to include custom sheets (default: True)
             
         Returns:
             Instance of the appropriate ReportGenerator subclass
@@ -95,5 +96,5 @@ class ReportGeneratorFactory:
                 f"{model_class.__name__} with ID {instance_id} does not exist"
             )
         
-        # Create and return the generator
-        return generator_class(instance)
+        # Create and return the generator with context
+        return generator_class(instance, include_custom_sheets=include_custom_sheets)
