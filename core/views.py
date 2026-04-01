@@ -17,6 +17,13 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .services import OutreachMetricsService
 from .models import Event, Project, Activity
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
+
+from .reports_generator.factory import ReportGeneratorFactory
 from .decorators import (
     require_create_permission,
     require_edit_permission,
