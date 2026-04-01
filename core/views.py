@@ -537,11 +537,11 @@ def report_list(request):
     
     # Filter by type and search
     if report_type in ['all', 'activities']:
-        activities = Activity.objects.select_related('proyecto').all().order_by('-fecha')
+        activities = Activity.objects.select_related('project').all().order_by('-date')
         if search:
             activities = activities.filter(
-                Q(nombre__icontains=search) |
-                Q(descripcion__icontains=search)
+                Q(name__icontains=search) |
+                Q(description__icontains=search)
             )
         add_activity_reports(activities)
     
