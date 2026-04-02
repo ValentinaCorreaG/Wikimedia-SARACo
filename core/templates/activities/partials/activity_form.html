@@ -278,6 +278,26 @@
             <p class="text-sm text-error mt-1">{{ form.editor_count_verification.errors.0 }}</p>
             {% endif %}
         </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.event_participation.id_for_label }}">
+                <span class="label-text font-semibold">Participación en Eventos</span>
+            </label>
+            {{ form.event_participation }}
+            {% if form.event_participation.errors %}
+            <p class="text-sm text-error mt-1">{{ form.event_participation.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label class="label" for="{{ form.event_participation_verification.id_for_label }}">
+                <span class="label-text font-semibold">Verificación</span>
+            </label>
+            {{ form.event_participation_verification }}
+            {% if form.event_participation_verification.errors %}
+            <p class="text-sm text-error mt-1">{{ form.event_participation_verification.errors.0 }}</p>
+            {% endif %}
+        </div>
     </div>
 </form>
 

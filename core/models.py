@@ -15,6 +15,7 @@ class Project(models.Model):
     PROGRAM_CHOICES = [
         ('ASC', 'Apropiación social de conocimiento'),
         ('TC', 'Tecnologías y comunidades'),
+        ('DA', 'Dirección Administrativa'),
     ]
 
     STATUS_CHOICES = [
@@ -53,6 +54,7 @@ class Activity(models.Model):
     PROGRAM_CHOICES = [
         ('ASC', 'Apropiación social de conocimiento'),
         ('TC', 'Tecnologías y comunidades'),
+        ('DA', 'Dirección Administrativa'),
     ]
     
     project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='activities', verbose_name="Proyecto")
@@ -96,6 +98,9 @@ class Activity(models.Model):
 
     editor_count = models.PositiveIntegerField(default=0, verbose_name="Número total de editores")
     editor_count_verification = models.TextField(blank=True, verbose_name="Links o verificación de editores")
+
+    event_participation = models.PositiveIntegerField(default=0, verbose_name="Participación en eventos")
+    event_participation_verification = models.TextField(blank=True, verbose_name="Links o verificación de participación en eventos")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

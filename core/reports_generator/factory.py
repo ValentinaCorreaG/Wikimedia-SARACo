@@ -5,7 +5,7 @@ Factory for creating the appropriate report generator based on type
 from django.core.exceptions import ObjectDoesNotExist
 from .activity import ActivityReportGenerator
 from .project import ProjectReportGenerator
-# from .generators.event import EventReportGenerator
+from .event import EventReportGenerator
 
 
 class ReportGeneratorFactory:
@@ -26,11 +26,11 @@ class ReportGeneratorFactory:
             'generator': ProjectReportGenerator,
             'model_path': 'core.models.Project',
         },
-        # 'event': {
-        #     'model': None,
-        #     'generator': EventReportGenerator,
-        #     'model_path': 'core.models.Event',
-        # },
+        'event': {
+            'model': None,
+            'generator': EventReportGenerator,
+            'model_path': 'core.models.Event',
+        },
     }
     
     @classmethod

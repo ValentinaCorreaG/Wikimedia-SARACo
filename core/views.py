@@ -15,7 +15,7 @@ from django.contrib.auth import login
 from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
 from django.urls import reverse
 from .services import OutreachMetricsService
-from .models import Event, Project, Activity
+from .models import Event, Project, Activity, Attendance
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -156,10 +156,18 @@ def base(request):
     """Render the home page."""
     outreach_metrics = OutreachMetricsService().fetch_metrics()
     activities_count = Event.objects.count()
+    
+    # Calcular departamentos únicos alcanzados en proyectos
+    unique_departments_count = Attendance.objects.filter(
+        event__proyecto__isnull=False
+    ).exclude(
+        department=''
+    ).values_list('department', flat=True).distinct().count()
 
     context = {
         "outreach_metrics": outreach_metrics,
         "activities_count": activities_count,
+        "unique_departments_count": unique_departments_count,
         "active_programs": 2,
     }
 

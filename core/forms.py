@@ -26,6 +26,7 @@ class ActivityForm(forms.ModelForm):
             'stories', 'stories_verification',
             'sustainability', 'sustainability_verification',
             'editor_count', 'editor_count_verification',
+            'event_participation', 'event_participation_verification',
         ]
         labels = {
             'project': 'Proyecto',
@@ -53,6 +54,8 @@ class ActivityForm(forms.ModelForm):
             'sustainability_verification': 'Links o verificación de sostenibilidad',
             'editor_count': 'Número total de editores',
             'editor_count_verification': 'Links o verificación de editores',
+            'event_participation': 'Participación en eventos',
+            'event_participation_verification': 'Links o verificación de participación en eventos',
         }
         widgets = {
             'project': forms.Select(attrs={'class': BASE_INPUT_CLASS}),
@@ -79,6 +82,8 @@ class ActivityForm(forms.ModelForm):
             'sustainability_verification': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
             'editor_count': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
             'editor_count_verification': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
+            'event_participation': forms.NumberInput(attrs={'class': BASE_INPUT_CLASS, 'min': '0'}),
+            'event_participation_verification': forms.Textarea(attrs={'class': BASE_INPUT_CLASS, 'placeholder': 'Links o notas de verificación', 'rows': 4}),
         }
 
 # Area choices and colors for consistent styling
@@ -86,6 +91,7 @@ AREA_CHOICES = [
     ('', '-- Selecciona un área --'),
     ('Apropiación social de conocimiento', 'Apropiación social de conocimiento'),
     ('tecnologías y comunidades', 'Tecnologías y comunidades'),
+    ('Dirección Administrativa', 'Dirección Administrativa'),
     ('otra', 'Otra'),
 ]
 
