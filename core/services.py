@@ -12,7 +12,7 @@ class OutreachMetricsService:
     """
     CAMPAIGN_URL = (
         "https://outreachdashboard.wmflabs.org/campaigns/"
-        "wikimedia_colombia_2025.json"
+        "wikimedia_colombia_2026.json"
     )
 
     @staticmethod

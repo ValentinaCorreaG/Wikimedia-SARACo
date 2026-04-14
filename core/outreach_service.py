@@ -13,7 +13,7 @@ class OutreachService:
     """Servicio para manejar estadísticas de Outreach Dashboard"""
     
     BASE_URL = 'https://outreachdashboard.wmflabs.org'
-    CAMPAIGN_SLUG = 'wikimedia_colombia_2025'
+    CAMPAIGN_SLUG = 'wikimedia_colombia_2026'
     CACHE_DURATION = timedelta(minutes=5)  # Cache de 5 minutos
     
     def __init__(self):

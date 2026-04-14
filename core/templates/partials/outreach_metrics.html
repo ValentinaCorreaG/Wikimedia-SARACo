@@ -16,12 +16,17 @@
     </div>
     <div class="mb-16">
         <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-bold text-gray-900">Estadisticas Wikimedia Colombia 2025</h2>
-            {% if outreach_metrics.error %}
-                <span class="badge badge-error">Error al cargar metricas</span>
-            {% else %}
-                <span class="badge badge-success">Actualizado</span>
-            {% endif %}
+            <h2 class="text-3xl font-bold text-gray-900">Estadisticas Wikimedia Colombia 2026</h2>
+            <div class="flex items-center gap-4">
+                {% if outreach_metrics.error %}
+                    <span class="badge badge-error">Error al cargar metricas</span>
+                {% else %}
+                    <span class="badge badge-success">Actualizado</span>
+                {% endif %}
+                <a class="btn btn-sm btn-primary" href="https://outreachdashboard.wmflabs.org/campaigns/wikimedia_colombia_2026/overview" target="_blank" rel="noopener noreferrer">
+                    Ver Dashboard Completo
+                </a>
+            </div>
         </div>
 
         {% if outreach_metrics.error %}
