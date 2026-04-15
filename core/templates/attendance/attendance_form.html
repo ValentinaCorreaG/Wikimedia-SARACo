@@ -3,7 +3,8 @@
 {% block title %}Registro de asistencia - {{ event.name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
+<style>[x-cloak] { display: none !important; }</style>
+<div class="max-w-2xl mx-auto" x-data="attendanceWizard()" x-cloak>
     <div class="bg-base-100 shadow-lg rounded-xl p-8 mt-6">
         <h1 class="text-2xl font-bold mb-2">Registro de asistencia</h1>
         <p class="text-sm text-base-content/70 mb-6">
@@ -11,30 +12,159 @@
             Fecha: {{ event.start_date }}{% if event.start_date != event.end_date %} - {{ event.end_date }}{% endif %}
         </p>
 
-        <form method="post" class="space-y-4">
+        <!-- Progress steps -->
+        <ul class="steps steps-horizontal w-full mb-8">
+            <template x-for="(label, idx) in stepLabels" :key="idx">
+                <li class="step text-xs"
+                    :class="idx <= step ? 'step-primary' : ''"
+                    x-text="label"
+                    @click="goTo(idx)">
+                </li>
+            </template>
+        </ul>
+
+        <form method="post" class="space-y-4" @submit="validateBeforeSubmit($event)">
             {% csrf_token %}
-            {% for field in form %}
+
+            <!-- Step 1: Personal information -->
+            <div x-show="step === 0" x-transition>
+                <h2 class="text-lg font-semibold mb-4">Información personal</h2>
+                {% with field=form.name %}
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}<span class="text-error"> *</span>
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                    <p x-show="errors.name" x-text="errors.name" class="text-xs text-error mt-1"></p>
+                </div>
+                {% endwith %}
+
+                {% with field=form.email %}
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}<span class="text-error"> *</span>
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                    <p x-show="errors.email" x-text="errors.email" class="text-xs text-error mt-1"></p>
+                </div>
+                {% endwith %}
+            </div>
+
+            <!-- Step 2: Wiki profile -->
+            <div x-show="step === 1" x-transition>
+                <h2 class="text-lg font-semibold mb-4">Perfil Wiki</h2>
+                {% with field=form.wiki_username %}
                 <div>
                     <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
                         {{ field.label }}
-                        {% if field.field.required %}
-                            <span class="text-error">*</span>
-                        {% endif %}
                     </label>
                     {{ field }}
-                    {% if field.help_text %}
-                        <p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>
-                    {% endif %}
-                    {% if field.errors %}
-                        <p class="text-xs text-error mt-1">
-                            {{ field.errors|striptags }}
-                        </p>
-                    {% endif %}
+                    {% if field.help_text %}<p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
                 </div>
-            {% endfor %}
+                {% endwith %}
+            </div>
 
-            <div class="pt-4">
-                <button type="submit" class="btn btn-primary w-full">
+            <!-- Step 3: Location & mode -->
+            <div x-show="step === 2" x-transition>
+                <h2 class="text-lg font-semibold mb-4">Ubicación y modalidad</h2>
+                {% with field=form.department %}
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                </div>
+                {% endwith %}
+
+                {% with field=form.attendance_mode %}
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}<span class="text-error"> *</span>
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                    <p x-show="errors.attendance_mode" x-text="errors.attendance_mode" class="text-xs text-error mt-1"></p>
+                </div>
+                {% endwith %}
+            </div>
+
+            <!-- Step 4: Satisfaction -->
+            <div x-show="step === 3" x-transition>
+                <h2 class="text-lg font-semibold mb-4">Satisfacción</h2>
+                {% with field=form.satisfaction %}
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}<span class="text-error"> *</span>
+                    </label>
+
+                    <input type="hidden" name="satisfaction" :value="selectedRating" id="id_satisfaction">
+
+                    <div class="flex items-center gap-3 mt-2">
+                        <template x-for="star in 5" :key="star">
+                            <button type="button"
+                                    @click="selectedRating = star"
+                                    @mouseenter="hoverRating = star"
+                                    @mouseleave="hoverRating = 0"
+                                    class="transition-transform hover:scale-110 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-10 w-10 transition-colors"
+                                     :class="star <= (hoverRating || selectedRating) ? 'text-warning fill-warning' : 'text-base-300 fill-base-300'"
+                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                            </button>
+                        </template>
+                        <span class="text-sm text-base-content/60 ml-2"
+                              x-text="selectedRating ? selectedRating + ' de 5' : ''"></span>
+                    </div>
+
+                    {% if field.help_text %}<p class="text-xs text-base-content/60 mt-2">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                    <p x-show="errors.satisfaction" x-text="errors.satisfaction" class="text-xs text-error mt-1"></p>
+                </div>
+                {% endwith %}
+            </div>
+
+            <!-- Step 5: Comments & submit -->
+            <div x-show="step === 4" x-transition>
+                <h2 class="text-lg font-semibold mb-4">Comentarios</h2>
+                {% with field=form.comments %}
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}<p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}<p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>{% endif %}
+                </div>
+                {% endwith %}
+            </div>
+
+            <!-- Navigation buttons -->
+            <div class="flex justify-between pt-6">
+                <button type="button"
+                        class="btn btn-ghost"
+                        x-show="step > 0"
+                        @click="prev()">
+                    &larr; Anterior
+                </button>
+                <div x-show="step === 0"></div>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        x-show="step < totalSteps - 1"
+                        @click="next()">
+                    Siguiente &rarr;
+                </button>
+
+                <button type="submit"
+                        class="btn btn-primary w-full sm:w-auto"
+                        x-show="step === totalSteps - 1">
                     Enviar registro
                 </button>
             </div>
@@ -43,3 +173,90 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script>
+function attendanceWizard() {
+    return {
+        step: {% if form.name.errors or form.email.errors %}0{% elif form.wiki_username.errors %}1{% elif form.department.errors or form.attendance_mode.errors %}2{% elif form.satisfaction.errors %}3{% elif form.comments.errors %}4{% else %}0{% endif %},
+        totalSteps: 5,
+        stepLabels: ['Personal', 'Wiki', 'Ubicación', 'Satisfacción', 'Comentarios'],
+        selectedRating: {{ form.satisfaction.value|default:"0" }},
+        hoverRating: 0,
+        errors: {},
+
+        validationRules: {
+            0: function(self) {
+                let ok = true;
+                self.errors = {};
+                const name = document.getElementById('id_name');
+                const email = document.getElementById('id_email');
+                if (!name || !name.value.trim()) { self.errors.name = 'Este campo es obligatorio.'; ok = false; }
+                if (!email || !email.value.trim()) {
+                    self.errors.email = 'Este campo es obligatorio.'; ok = false;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+                    self.errors.email = 'Introduce un correo electrónico válido.'; ok = false;
+                }
+                return ok;
+            },
+            2: function(self) {
+                let ok = true;
+                self.errors = {};
+                const mode = document.getElementById('id_attendance_mode');
+                if (!mode || !mode.value) { self.errors.attendance_mode = 'Este campo es obligatorio.'; ok = false; }
+                return ok;
+            },
+            3: function(self) {
+                let ok = true;
+                self.errors = {};
+                if (!self.selectedRating || self.selectedRating < 1 || self.selectedRating > 5) {
+                    self.errors.satisfaction = 'Selecciona una calificación entre 1 y 5.'; ok = false;
+                }
+                return ok;
+            },
+        },
+
+        validateStep(idx) {
+            if (this.validationRules[idx]) {
+                return this.validationRules[idx](this);
+            }
+            this.errors = {};
+            return true;
+        },
+
+        next() {
+            if (this.validateStep(this.step) && this.step < this.totalSteps - 1) {
+                this.step++;
+            }
+        },
+
+        prev() {
+            this.errors = {};
+            if (this.step > 0) this.step--;
+        },
+
+        goTo(idx) {
+            if (idx < this.step) {
+                this.errors = {};
+                this.step = idx;
+            } else if (idx > this.step) {
+                for (let i = this.step; i < idx; i++) {
+                    if (!this.validateStep(i)) return;
+                }
+                this.step = idx;
+            }
+        },
+
+        validateBeforeSubmit(event) {
+            for (let i = 0; i < this.totalSteps; i++) {
+                if (!this.validateStep(i)) {
+                    this.step = i;
+                    event.preventDefault();
+                    return;
+                }
+            }
+        },
+    };
+}
+</script>
+{% endblock %}
