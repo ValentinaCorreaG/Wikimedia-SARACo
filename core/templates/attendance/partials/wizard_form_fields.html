@@ -1,0 +1,65 @@
+{# Renders all fields for the current wizard step; step 3 uses fieldset + horizontal-ish radios #}
+{% for field in form %}
+    <div>
+        {% if step == 3 %}
+        <fieldset class="rounded-lg border border-base-300 p-4 mb-4">
+            <legend class="text-sm font-medium px-1 mb-2 max-w-none">
+                {{ field.label }}
+                {% if field.field.required %}<span class="text-error" aria-hidden="true">*</span>{% endif %}
+            </legend>
+            <div
+                class="[&_ul]:flex [&_ul]:flex-wrap [&_ul]:gap-x-4 [&_ul]:gap-y-2 [&_ul]:pl-0 [&_li]:list-none"
+                role="presentation"
+            >
+                {{ field }}
+            </div>
+            {% if field.help_text %}
+                <p class="text-xs text-base-content/60 mt-2" id="{{ field.id_for_label }}_help">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+                <p class="text-xs text-error mt-2" role="alert">
+                    {{ field.errors|striptags }}
+                </p>
+            {% endif %}
+        </fieldset>
+        {% elif field.field.widget.input_type == 'checkbox' %}
+        <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3 py-1">
+                {{ field }}
+                <span class="label-text text-sm font-medium">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+                </span>
+            </label>
+            {% if field.help_text %}
+                <p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+                <p class="text-xs text-error mt-1">{{ field.errors|striptags }}</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <label class="block text-sm font-medium mb-1" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}
+                <span class="text-error">*</span>
+            {% endif %}
+        </label>
+        {% if field.name == 'activity_incidence' or field.name == 'future_participation' %}
+        <div class="[&_ul]:flex [&_ul]:flex-wrap [&_ul]:gap-x-3 [&_ul]:gap-y-2 [&_ul]:pl-0 [&_li]:list-none">
+            {{ field }}
+        </div>
+        {% else %}
+            {{ field }}
+        {% endif %}
+        {% if field.help_text %}
+            <p class="text-xs text-base-content/60 mt-1">{{ field.help_text }}</p>
+        {% endif %}
+        {% if field.errors %}
+            <p class="text-xs text-error mt-1">
+                {{ field.errors|striptags }}
+            </p>
+        {% endif %}
+        {% endif %}
+    </div>
+{% endfor %}

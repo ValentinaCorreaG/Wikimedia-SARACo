@@ -1,0 +1,6 @@
+{# Event title and dates for attendance wizard #}
+<h1 class="text-2xl font-bold mb-2">Registro de asistencia</h1>
+<p class="text-sm text-base-content/70 mb-4">
+    Evento: <span class="font-semibold">{{ event.name }}</span><br>
+    Fecha: {{ event.start_date }}{% if event.start_date != event.end_date %} — {{ event.end_date }}{% endif %}
+</p>

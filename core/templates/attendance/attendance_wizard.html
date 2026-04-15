@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de asistencia — Paso {{ step }} de {{ total_steps }} · {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-base-100 shadow-lg rounded-xl p-8 mt-6">
+        {% include "attendance/partials/wizard_event_header.html" %}
+
+        {% include "attendance/partials/wizard_progress.html" %}
+
+        <h2 class="text-lg font-semibold mb-4">{{ section_title }}</h2>
+
+        {% if step == 1 %}
+            {% include "attendance/partials/wizard_data_treatment.html" %}
+        {% endif %}
+
+        {% if step == 3 %}
+            {% include "attendance/partials/wizard_step3_intro.html" %}
+        {% endif %}
+
+        {% if show_final_validation_errors and form.non_field_errors %}
+        <div class="alert alert-error mb-4 text-sm" role="alert">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'register_attendance' event.attendance_token %}" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="wizard_step" value="{{ step }}">
+
+            {% include "attendance/partials/wizard_form_fields.html" %}
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-6">
+                {% if prev_step %}
+                <a href="{% url 'register_attendance' event.attendance_token %}?step={{ prev_step }}" class="btn btn-outline order-2 sm:order-1">
+                    Anterior
+                </a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary flex-1 order-1 sm:order-2">
+                    {% if step < total_steps %}Siguiente{% else %}Enviar registro{% endif %}
+                </button>
+            </div>
+        </form>
+
+        <p class="text-xs text-base-content/50 mt-6 text-center">
+            <a href="{% url 'register_attendance' event.attendance_token %}?reiniciar=1" class="link link-hover">Empezar de nuevo</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

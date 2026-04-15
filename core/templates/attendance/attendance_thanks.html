@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}¡Gracias! — {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-base-100 shadow-lg rounded-xl p-8 mt-6 text-center">
+        <h1 class="text-2xl font-bold mb-3">¡Gracias por tu participación y respuestas!</h1>
+        <p class="text-base-content/80 mb-6">
+            Tu registro de asistencia y la encuesta quedaron guardados para el evento
+            <span class="font-semibold">{{ event.name }}</span>.
+        </p>
+        <a href="{% url 'calendar' %}" class="btn btn-primary">Volver al calendario</a>
+    </div>
+</div>
+{% endblock %}

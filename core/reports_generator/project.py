@@ -33,7 +33,7 @@ class ProjectReportGenerator(BaseReportGenerator):
         if self.instance.events.exists():
             data['Total de Participantes en Eventos'] = self._get_total_event_participants()
             data['Diversidad Geográfica en Eventos'] = self._get_total_geographic_diversity()
-            data['Satisfacción Promedio en Eventos'] = self._get_total_average_satisfaction()
+            data['Aceptabilidad Promedio en Eventos (Sección 3)'] = self._get_total_average_satisfaction()
             data['Tasa de Retención (2+ eventos) %'] = self._get_retention_rate()
         
         self.df = pd.DataFrame([data])
@@ -105,7 +105,7 @@ class ProjectReportGenerator(BaseReportGenerator):
                 # Add event-specific metrics
                 event_data['Total de Participantes'] = event_gen._get_total_participants()
                 event_data['Diversidad Geográfica'] = event_gen._get_geographic_diversity()
-                event_data['Satisfacción Promedio'] = event_gen._get_average_satisfaction()
+                event_data['Aceptabilidad Promedio (Sección 3)'] = event_gen._get_average_satisfaction()
                 
                 events_data.append(event_data)
             
@@ -253,9 +253,8 @@ class ProjectReportGenerator(BaseReportGenerator):
         
         for event in self.instance.events.all():
             for attendance in event.attendances.all():
-                if attendance.satisfaction:
-                    total_satisfaction += attendance.satisfaction
-                    count += 1
+                total_satisfaction += attendance.average_satisfaction_score
+                count += 1
         
         if count == 0:
             return 0

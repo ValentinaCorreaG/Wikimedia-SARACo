@@ -26,7 +26,8 @@ class EventReportGenerator(BaseReportGenerator):
         # Add custom columns for event metrics
         data['Total de Participantes'] = self._get_total_participants()
         data['Diversidad Geográfica'] = self._get_geographic_diversity()
-        data['Satisfacción Promedio'] = self._get_average_satisfaction()
+        # section Acceptability, average satisfaction score
+        data['Aceptabilidad Promedio (Sección 3)'] = self._get_average_satisfaction()
 
         self.df = pd.DataFrame([data])
 
@@ -167,14 +168,11 @@ class EventReportGenerator(BaseReportGenerator):
         if not attendances.exists():
             return 0
         
-        # Sum all satisfaction ratings
+        # Sum per-record mean of the five acceptability items (1–5 each)
         total_satisfaction = sum(
-            attendance.satisfaction for attendance in attendances 
-            if attendance.satisfaction
+            attendance.average_satisfaction_score for attendance in attendances
         )
-        
-        # Count how many records have satisfaction data
-        count = sum(1 for attendance in attendances if attendance.satisfaction)
+        count = attendances.count()
         
         if count == 0:
             return 0
