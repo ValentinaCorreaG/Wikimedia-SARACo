@@ -1,0 +1,13 @@
+{# DaisyUI steps progress #}
+<div class="mb-6" aria-label="Progreso del formulario: paso {{ step }} de {{ total_steps }}">
+    <ul class="steps steps-vertical sm:steps-horizontal w-full">
+        {% for title in step_titles %}
+        <li class="step {% if forloop.counter <= step %}step-primary{% endif %}">
+            <span class="text-xs sm:text-sm">{{ title }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="mt-2 text-sm text-base-content/70">
+        Paso {{ step }} de {{ total_steps }}: {{ section_title }}
+    </div>
+</div>

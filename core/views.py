@@ -12,7 +12,14 @@ from datetime import datetime, timedelta
 from calendar import monthrange
 from django.contrib import messages
 from django.contrib.auth import login
-from .forms import EventForm, AttendanceForm, ProjectForm, ActivityForm
+from .forms import (
+    EventForm,
+    AttendanceForm,
+    ATTENDANCE_WIZARD_STEP_FORMS,
+    ATTENDANCE_SATISFACTION_FIELD_NAMES,
+    ProjectForm,
+    ActivityForm,
+)
 from django.urls import reverse
 from .services import OutreachMetricsService
 from .models import Event, Project, Activity, Attendance
@@ -373,27 +380,188 @@ def event_detail(request, pk):
     return render(request, 'calendar/partials/event_detail.html', {'event': event, 'attendance_url': attendance_url})
 
 
+ATTENDANCE_WIZARD_STEP_COUNT = len(ATTENDANCE_WIZARD_STEP_FORMS)
+
+ATTENDANCE_WIZARD_SECTION_TITLES = (
+    "Sección 1 — Tratamiento de datos e identificación",
+    "Sección 2 — Datos demográficos",
+    "Sección 3 — Aceptabilidad",
+    "Sección 4 — Evaluación de apropiación",
+    "Sección 5 — Retroalimentación",
+)
+
+ATTENDANCE_WIZARD_STEP_TITLES = (
+    "Tratamiento de datos",
+    "Datos demográficos",
+    "Aceptabilidad",
+    "Evaluación de apropiación",
+    "Retroalimentación",
+)
+
+
+def _attendance_wizard_session_key(attendance_token):
+    return f"attendance_wizard_{attendance_token}"
+
+
+def _attendance_wizard_completed_key(attendance_token):
+    return f"attendance_wizard_completed_{attendance_token}"
+
+
+def _first_incomplete_wizard_step(data):
+    """
+    Return the first step (1–5) that is missing required data, or None if the
+    wizard payload is complete (ready for final validation on step 5 POST).
+    """
+    w = data or {}
+    if (
+        not (w.get("name") or "").strip()
+        or not (w.get("email") or "").strip()
+        or w.get("accepts_data_processing") is not True
+    ):
+        return 1
+    if not w.get("department") or not w.get("attendance_mode"):
+        return 2
+    for f in ATTENDANCE_SATISFACTION_FIELD_NAMES:
+        if w.get(f) is None:
+            return 3
+    inc = w.get("activity_incidence")
+    if not inc:
+        return 4
+    other = (w.get("activity_incidence_other") or "").strip()
+    if inc == Attendance.ActivityIncidenceChoices.OTHER and not other:
+        return 4
+    if not (w.get("learned_new_aspect") or "").strip() or not (
+        w.get("interesting_aspect_discuss") or ""
+    ).strip():
+        return 4
+    if not w.get("future_participation"):
+        return 5
+    return None
+
+
 def register_attendance(request, attendance_token):
     """
-    Register attendance to an event using its public attendance token.
+    Multi-step attendance registration (session-backed wizard), then thank-you page.
     """
     event = get_object_or_404(Event, attendance_token=attendance_token)
+    session_key = _attendance_wizard_session_key(attendance_token)
+    completed_key = _attendance_wizard_completed_key(attendance_token)
+    wizard_url = reverse("register_attendance", kwargs={"attendance_token": attendance_token})
 
-    if request.method == 'POST':
-        form = AttendanceForm(request.POST)
+    if request.GET.get("completado") == "1":
+        if not request.session.pop(completed_key, False):
+            return redirect(wizard_url)
+        return render(
+            request,
+            "attendance/attendance_thanks.html",
+            {"event": event},
+        )
+
+    if request.GET.get("reiniciar") == "1":
+        request.session.pop(session_key, None)
+        request.session.pop(completed_key, None)
+        messages.info(request, "Se reinició el formulario.")
+        return redirect(wizard_url)
+
+    session_data = request.session.get(session_key, {})
+
+    if request.method == "POST":
+        try:
+            posted_step = int(request.POST.get("wizard_step", "1"))
+        except (TypeError, ValueError):
+            posted_step = 1
+        posted_step = max(1, min(posted_step, ATTENDANCE_WIZARD_STEP_COUNT))
+
+        form_cls = ATTENDANCE_WIZARD_STEP_FORMS[posted_step - 1]
+        form = form_cls(request.POST)
         if form.is_valid():
-            attendance = form.save(commit=False)
-            attendance.event = event
-            attendance.save()
-            messages.success(request, '¡Gracias por registrar tu asistencia!')
-            return redirect('register_attendance', attendance_token=attendance_token)
-    else:
-        form = AttendanceForm()
+            merged = {**session_data, **form.cleaned_data}
+            request.session[session_key] = merged
+            request.session.modified = True
 
-    return render(request, 'attendance/attendance_form.html', {
-        'event': event,
-        'form': form,
-    })
+            if posted_step < ATTENDANCE_WIZARD_STEP_COUNT:
+                next_step = posted_step + 1
+                return redirect(f"{wizard_url}?step={next_step}")
+
+            final_form = AttendanceForm(data=merged)
+            if final_form.is_valid():
+                attendance = final_form.save(commit=False)
+                attendance.event = event
+                attendance.save()
+                request.session.pop(session_key, None)
+                request.session[completed_key] = True
+                messages.success(
+                    request,
+                    "¡Gracias por registrar tu asistencia y completar la encuesta!",
+                )
+                return redirect(f"{wizard_url}?completado=1")
+
+            messages.error(
+                request,
+                "No se pudo guardar el registro. Revise los datos e intente de nuevo.",
+            )
+            return render(
+                request,
+                "attendance/attendance_wizard.html",
+                {
+                    "event": event,
+                    "form": final_form,
+                    "step": ATTENDANCE_WIZARD_STEP_COUNT,
+                    "total_steps": ATTENDANCE_WIZARD_STEP_COUNT,
+                    "prev_step": ATTENDANCE_WIZARD_STEP_COUNT - 1,
+                    "section_title": ATTENDANCE_WIZARD_SECTION_TITLES[
+                        ATTENDANCE_WIZARD_STEP_COUNT - 1
+                    ],
+                    "step_titles": ATTENDANCE_WIZARD_STEP_TITLES,
+                    "session_data": merged,
+                    "show_final_validation_errors": True,
+                },
+            )
+
+        return render(
+            request,
+            "attendance/attendance_wizard.html",
+            {
+                "event": event,
+                "form": form,
+                "step": posted_step,
+                "total_steps": ATTENDANCE_WIZARD_STEP_COUNT,
+                "prev_step": posted_step - 1 if posted_step > 1 else None,
+                "section_title": ATTENDANCE_WIZARD_SECTION_TITLES[posted_step - 1],
+                "step_titles": ATTENDANCE_WIZARD_STEP_TITLES,
+                "session_data": session_data,
+                "show_final_validation_errors": False,
+            },
+        )
+
+    try:
+        step = int(request.GET.get("step", "1"))
+    except (TypeError, ValueError):
+        step = 1
+    step = max(1, min(step, ATTENDANCE_WIZARD_STEP_COUNT))
+
+    first_incomplete = _first_incomplete_wizard_step(session_data)
+    if first_incomplete is not None and step > first_incomplete:
+        return redirect(f"{wizard_url}?step={first_incomplete}")
+
+    form_cls = ATTENDANCE_WIZARD_STEP_FORMS[step - 1]
+    form = form_cls(initial=session_data)
+
+    return render(
+        request,
+        "attendance/attendance_wizard.html",
+        {
+            "event": event,
+            "form": form,
+            "step": step,
+            "total_steps": ATTENDANCE_WIZARD_STEP_COUNT,
+            "prev_step": step - 1 if step > 1 else None,
+            "section_title": ATTENDANCE_WIZARD_SECTION_TITLES[step - 1],
+            "step_titles": ATTENDANCE_WIZARD_STEP_TITLES,
+            "session_data": session_data,
+            "show_final_validation_errors": False,
+        },
+    )
 
 
 # -------------------------

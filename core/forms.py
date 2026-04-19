@@ -8,7 +8,15 @@ BASE_INPUT_CLASS = (
     "focus:ring-2 focus:ring-primary-300 focus:border-transparent"
 )
 
-from .models import Event, Project
+# Escala Likert 1–5 para aceptabilidad (mismas etiquetas que en la encuesta de referencia)
+SATISFACTION_SCALE_CHOICES = [
+    (1, "Muy insatisfecho"),
+    (2, "Insatisfecho"),
+    (3, "Satisfecho"),
+    (4, "Muy satisfecho"),
+    (5, "Completamente satisfecho"),
+]
+
 
 class ActivityForm(forms.ModelForm):
     """Formulario para crear y editar actividades, con etiquetas en español y campos en inglés."""
@@ -197,40 +205,196 @@ class ProjectForm(forms.ModelForm):
             }),
         }
         
-class AttendanceForm(forms.ModelForm):
-    """Form for registering attendance to an event."""
+class AttendanceStep1Form(forms.ModelForm):
+    """Sección 1: tratamiento de datos e identificación."""
 
     class Meta:
         model = Attendance
-        fields = ['name', 'email', 'wiki_username', 'department', 'attendance_mode', 'satisfaction', 'comments']
+        fields = ("accepts_data_processing", "name", "email", "wiki_username")
         widgets = {
-            'name': forms.TextInput(attrs={
-                'class': BASE_INPUT_CLASS,
-                'placeholder': 'Tu nombre completo'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': BASE_INPUT_CLASS,
-                'placeholder': 'tu@correo.com'
-            }),
-            'wiki_username': forms.TextInput(attrs={
-                'class': BASE_INPUT_CLASS,
-                'placeholder': 'Tu usuario de Wikipedia (opcional)'
-            }),
-            'department': forms.Select(attrs={
-                'class': BASE_INPUT_CLASS,
-            }),
-            'attendance_mode': forms.Select(attrs={
-                'class': BASE_INPUT_CLASS,
-            }),
-            'satisfaction': forms.NumberInput(attrs={
-                'class': BASE_INPUT_CLASS,
-                'min': '1',
-                'max': '5',
-                'placeholder': 'Califica de 1 a 5'
-            }),
-            'comments': forms.Textarea(attrs={
-                'class': BASE_INPUT_CLASS,
-                'rows': 4,
-                'placeholder': 'Comentarios o sugerencias (opcional)'
-            }),
+            "accepts_data_processing": forms.CheckboxInput(
+                attrs={"class": "checkbox checkbox-primary"}
+            ),
+            "name": forms.TextInput(
+                attrs={
+                    "class": BASE_INPUT_CLASS,
+                    "placeholder": "Tu nombre completo",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "class": BASE_INPUT_CLASS,
+                    "placeholder": "tu@correo.com",
+                }
+            ),
+            "wiki_username": forms.TextInput(
+                attrs={
+                    "class": BASE_INPUT_CLASS,
+                    "placeholder": "Tu usuario de Wikipedia (opcional)",
+                }
+            ),
         }
+
+    def clean_accepts_data_processing(self):
+        value = self.cleaned_data.get("accepts_data_processing")
+        if not value:
+            raise forms.ValidationError(
+                "Debe aceptar el tratamiento de datos personales para continuar."
+            )
+        return value
+
+
+class AttendanceStep2Form(forms.ModelForm):
+    """Sección 2: datos demográficos."""
+
+    class Meta:
+        model = Attendance
+        fields = ("department", "attendance_mode")
+        widgets = {
+            "department": forms.Select(attrs={"class": BASE_INPUT_CLASS}),
+            "attendance_mode": forms.Select(attrs={"class": BASE_INPUT_CLASS}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["department"].required = True
+
+
+class AttendanceStep3Form(forms.ModelForm):
+    """Sección 3: aceptabilidad (cinco ítems 1–5, escala Likert con radios)."""
+
+    class Meta:
+        model = Attendance
+        fields = (
+            "satisfaction_methodology",
+            "satisfaction_session_usefulness",
+            "satisfaction_schedule_timing",
+            "satisfaction_logistics",
+            "satisfaction_activity_usefulness",
+        )
+        labels = {
+            "satisfaction_methodology": "La metodología usada en la sesión",
+            "satisfaction_session_usefulness": "La utilidad de la sesión",
+            "satisfaction_schedule_timing": "El horario del encuentro y el tiempo de la actividad",
+            "satisfaction_logistics": "Organización logística de la actividad",
+            "satisfaction_activity_usefulness": "Utilidad de la actividad",
+        }
+
+    @classmethod
+    def apply_satisfaction_radio_fields(cls, form):
+        """Sustituye los cinco enteros por TypedChoiceField + RadioSelect (mismo valor 1–5 en BD)."""
+        for fname in cls.Meta.fields:
+            form.fields[fname] = forms.TypedChoiceField(
+                label=cls.Meta.labels[fname],
+                coerce=int,
+                choices=SATISFACTION_SCALE_CHOICES,
+                required=True,
+                widget=forms.RadioSelect(),
+            )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_satisfaction_radio_fields(self)
+
+
+class AttendanceStep4Form(forms.ModelForm):
+    """Sección 4: evaluación de apropiación."""
+
+    class Meta:
+        model = Attendance
+        fields = (
+            "activity_incidence",
+            "activity_incidence_other",
+            "learned_new_aspect",
+            "interesting_aspect_discuss",
+        )
+        widgets = {
+            "activity_incidence": forms.RadioSelect,
+            "activity_incidence_other": forms.Textarea(
+                attrs={"class": BASE_INPUT_CLASS, "rows": 3}
+            ),
+            "learned_new_aspect": forms.Textarea(
+                attrs={"class": BASE_INPUT_CLASS, "rows": 3}
+            ),
+            "interesting_aspect_discuss": forms.Textarea(
+                attrs={"class": BASE_INPUT_CLASS, "rows": 3}
+            ),
+        }
+        labels = {
+            "activity_incidence": "¿Cuál fue la incidencia que tuvo la actividad?",
+            "activity_incidence_other": "Especifique (opción «Otro»)",
+            "learned_new_aspect": "Mencione un aspecto que no sabía antes de este taller",
+            "interesting_aspect_discuss": (
+                "Mencione un (1) aspecto que fue tan interesante que lo discutiría con otras personas"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["activity_incidence"].choices = Attendance.ActivityIncidenceChoices.choices
+        self.fields["activity_incidence"].required = True
+        self.fields["learned_new_aspect"].required = True
+        self.fields["interesting_aspect_discuss"].required = True
+
+    def clean(self):
+        cleaned = super().clean()
+        incidence = cleaned.get("activity_incidence")
+        other = (cleaned.get("activity_incidence_other") or "").strip()
+        if incidence == Attendance.ActivityIncidenceChoices.OTHER and not other:
+            self.add_error(
+                "activity_incidence_other",
+                "Describa la incidencia cuando elige la opción «Otro».",
+            )
+        return cleaned
+
+
+class AttendanceStep5Form(forms.ModelForm):
+    """Sección 5: retroalimentación."""
+
+    class Meta:
+        model = Attendance
+        fields = ("future_participation", "feedback_improvements")
+        widgets = {
+            "future_participation": forms.RadioSelect,
+            "feedback_improvements": forms.Textarea(
+                attrs={"class": BASE_INPUT_CLASS, "rows": 4}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["future_participation"].choices = Attendance.FutureParticipationChoices.choices
+        self.fields["future_participation"].required = True
+
+
+ATTENDANCE_WIZARD_STEP_FORMS = (
+    AttendanceStep1Form,
+    AttendanceStep2Form,
+    AttendanceStep3Form,
+    AttendanceStep4Form,
+    AttendanceStep5Form,
+)
+
+ATTENDANCE_SATISFACTION_FIELD_NAMES = AttendanceStep3Form.Meta.fields
+
+
+def _merge_attendance_step_widgets():
+    merged = {}
+    for form_cls in ATTENDANCE_WIZARD_STEP_FORMS:
+        w = getattr(form_cls.Meta, "widgets", None)
+        if w:
+            merged.update(w)
+    return merged
+
+
+class AttendanceForm(forms.ModelForm):
+    """Todos los campos de asistencia (un solo envío); el asistente usa los pasos parciales."""
+
+    class Meta:
+        model = Attendance
+        exclude = ("event", "created_at")
+        widgets = _merge_attendance_step_widgets()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        AttendanceStep3Form.apply_satisfaction_radio_fields(self)

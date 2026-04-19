@@ -195,8 +195,12 @@ class Event(models.Model):
 
 class Attendance(models.Model):
     """
-    Event attendance record with basic contact info and satisfaction rating.
+    Event attendance record: consent, contact, demographics, acceptability (five 1–5 items),
+    appropriation, and feedback. Legacy single satisfaction/comments were replaced by
+    structured fields.
     """
+
+    _SATISFACTION_VALIDATORS = [MinValueValidator(1), MaxValueValidator(5)]
 
     class DepartmentChoices(models.TextChoices):
         AMAZONAS = "amazonas", "Amazonas"
@@ -236,11 +240,35 @@ class Attendance(models.Model):
         PRESENTIAL = "presential", "Presencial"
         VIRTUAL = "virtual", "Virtual"
 
+    class ActivityIncidenceChoices(models.TextChoices):
+        OPEN_REFLECTION = (
+            "a",
+            "Abrió posibilidades de reflexión frente al conocimiento libre.",
+        )
+        COMMITMENT = (
+            "b",
+            "Me generó compromiso con la necesidad de contribuir al conocimiento libre.",
+        )
+        CHANGED_UNDERSTANDING = (
+            "c",
+            "Me animó a cambiar mi comprensión sobre la construcción de conocimiento colaborativo.",
+        )
+        OTHER = "d", "Otro"
+
+    class FutureParticipationChoices(models.TextChoices):
+        YES = "yes", "Sí"
+        NO = "no", "No"
+        MAYBE = "maybe", "Tal vez"
+
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
         related_name="attendances",
         verbose_name="Evento",
+    )
+    accepts_data_processing = models.BooleanField(
+        default=False,
+        verbose_name="Aceptación del tratamiento de datos personales",
     )
     name = models.CharField(max_length=150, verbose_name="Nombre")
     email = models.EmailField(verbose_name="Correo electrónico")
@@ -251,12 +279,63 @@ class Attendance(models.Model):
         choices=AttendanceModeChoices.choices,
         verbose_name="Modo de asistencia"
     )
-    satisfaction = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name="Satisfacción (1-5)",
-        help_text="Indique su nivel de satisfacción en una escala de 1 a 5.",
+    satisfaction_methodology = models.PositiveSmallIntegerField(
+        validators=_SATISFACTION_VALIDATORS,
+        verbose_name="Satisfacción: metodología usada en la sesión (1–5)",
+        help_text="1 = muy insatisfecho, 5 = completamente satisfecho.",
     )
-    comments = models.TextField(blank=True, verbose_name="Comentarios")
+    satisfaction_session_usefulness = models.PositiveSmallIntegerField(
+        validators=_SATISFACTION_VALIDATORS,
+        verbose_name="Satisfacción: utilidad de la sesión (1–5)",
+        help_text="1 = muy insatisfecho, 5 = completamente satisfecho.",
+    )
+    satisfaction_schedule_timing = models.PositiveSmallIntegerField(
+        validators=_SATISFACTION_VALIDATORS,
+        verbose_name="Satisfacción: horario del encuentro y tiempo (1–5)",
+        help_text="1 = muy insatisfecho, 5 = completamente satisfecho.",
+    )
+    satisfaction_logistics = models.PositiveSmallIntegerField(
+        validators=_SATISFACTION_VALIDATORS,
+        verbose_name="Satisfacción: organización logística (1–5)",
+        help_text="1 = muy insatisfecho, 5 = completamente satisfecho.",
+    )
+    satisfaction_activity_usefulness = models.PositiveSmallIntegerField(
+        validators=_SATISFACTION_VALIDATORS,
+        verbose_name="Satisfacción: utilidad de la actividad (1–5)",
+        help_text="1 = muy insatisfecho, 5 = completamente satisfecho.",
+    )
+    activity_incidence = models.CharField(
+        max_length=1,
+        choices=ActivityIncidenceChoices.choices,
+        blank=True,
+        null=True,
+        verbose_name="Incidencia de la actividad",
+    )
+    activity_incidence_other = models.TextField(
+        blank=True,
+        verbose_name="Incidencia (texto si eligió «Otro»)",
+    )
+    learned_new_aspect = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Aspecto que no sabía antes del taller",
+    )
+    interesting_aspect_discuss = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Aspecto tan interesante que lo discutiría con otras personas",
+    )
+    future_participation = models.CharField(
+        max_length=10,
+        choices=FutureParticipationChoices.choices,
+        blank=True,
+        null=True,
+        verbose_name="¿Participar en futuras actividades de Wikimedia Colombia?",
+    )
+    feedback_improvements = models.TextField(
+        blank=True,
+        verbose_name="Aspectos que podrían mejorarse en futuras actividades",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -266,3 +345,15 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.event.name}"
+
+    @property
+    def average_satisfaction_score(self):
+        """Mean of the five 1–5 acceptability items for reports and summaries."""
+        scores = (
+            self.satisfaction_methodology,
+            self.satisfaction_session_usefulness,
+            self.satisfaction_schedule_timing,
+            self.satisfaction_logistics,
+            self.satisfaction_activity_usefulness,
+        )
+        return sum(scores) / len(scores)
