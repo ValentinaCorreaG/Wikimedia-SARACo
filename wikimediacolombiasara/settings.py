@@ -144,7 +144,10 @@ SOCIAL_AUTH_MEDIAWIKI_URL = os.getenv(
     'MEDIAWIKI_URL',
     'https://meta.wikimedia.org/w/index.php',
 )
-SOCIAL_AUTH_MEDIAWIKI_CALLBACK = 'http://127.0.0.1:8000/oauth/complete/mediawiki/'
+SOCIAL_AUTH_MEDIAWIKI_CALLBACK = os.getenv(
+    'SOCIAL_AUTH_MEDIAWIKI_CALLBACK',
+    'http://127.0.0.1:8000/oauth/complete/mediawiki/',
+)
 
 # Social Auth Pipeline with custom steps
 SOCIAL_AUTH_PIPELINE = (
