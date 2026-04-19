@@ -686,6 +686,7 @@ def report_list(request):
             reports.append({
                 'id': activity.id,
                 'nombre': activity.name,
+                'project_name': activity.project.name,
                 'area': activity.get_area_display() if activity.area else 'Sin especificar',
                 'tipo': 'Actividad',
                 'object_type': 'activity',
@@ -698,6 +699,7 @@ def report_list(request):
                 'id': event.id,
                 'nombre': event.name,
                 'area': event.responsible_area,
+                'project_name': event.proyecto.name,
                 'tipo': event.get_activity_type_display() or 'Evento',
                 'object_type': 'event',
                 'object': event,

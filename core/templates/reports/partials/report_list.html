@@ -16,7 +16,10 @@
             {% if reports %}
                 {% for report in reports %}
                 <tr class="hover h-16">
-                    <td class="font-medium">{{ report.nombre }}</td>
+                    <td class="font-medium">{{ report.nombre }} 
+                        {% if report.project_name %} 
+                            ({{ report.project_name }})
+                        {% endif %}</td>
                     <td>
                         <div>{{ report.area }}</div>
                     </td>
