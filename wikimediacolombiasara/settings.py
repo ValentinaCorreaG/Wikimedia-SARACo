@@ -12,33 +12,57 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-import environ
-
-# Initialize environ
-env = environ.Env(
-    # Set casting and default values
-    DEBUG=(bool, False),
-)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Read .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# Archivo .env explícito (ruta absoluta desde la raíz del proyecto)
+ENV_FILE = BASE_DIR / '.env'
+
+
+def load_env_file(path: Path) -> None:
+    """Carga variables desde un archivo .env hacia os.environ (sin pisar vars ya definidas)."""
+    if not path.is_file():
+        return
+    for raw in path.read_text(encoding='utf-8').splitlines():
+        line = raw.strip()
+        if not line or line.startswith('#'):
+            continue
+        if line.startswith('export '):
+            line = line[7:].strip()
+        if '=' not in line:
+            continue
+        key, _, value = line.partition('=')
+        key = key.strip()
+        if not key:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
+
+
+load_env_file(ENV_FILE)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-swn69r5c4)%-fb*3v=)2gj2dj!)$#%+s%4la4z-vc#_492@k*5')
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-swn69r5c4)%-fb*3v=)2gj2dj!)$#%+s%4la4z-vc#_492@k*5',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DJANGO_DEBUG', default=True)
+DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
-
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'sara-colombia.toolforge.org').split(',')
+    if h.strip()
+]
 
 # Application definition
 
@@ -114,9 +138,12 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Social Auth Configuration
-SOCIAL_AUTH_MEDIAWIKI_KEY = env('MEDIAWIKI_OAUTH_KEY', default='')
-SOCIAL_AUTH_MEDIAWIKI_SECRET = env('SOCIAL_AUTH_MEDIAWIKI_SECRET', default='')
-SOCIAL_AUTH_MEDIAWIKI_URL = env('MEDIAWIKI_URL', default='https://meta.wikimedia.org/w/index.php')
+SOCIAL_AUTH_MEDIAWIKI_KEY = os.getenv('MEDIAWIKI_OAUTH_KEY', '')
+SOCIAL_AUTH_MEDIAWIKI_SECRET = os.getenv('SOCIAL_AUTH_MEDIAWIKI_SECRET', '')
+SOCIAL_AUTH_MEDIAWIKI_URL = os.getenv(
+    'MEDIAWIKI_URL',
+    'https://meta.wikimedia.org/w/index.php',
+)
 SOCIAL_AUTH_MEDIAWIKI_CALLBACK = 'http://127.0.0.1:8000/oauth/complete/mediawiki/'
 
 # Social Auth Pipeline with custom steps
@@ -185,7 +212,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TAILWIND_APP_NAME = 'theme'
-NPM_BIN_PATH = env('NPM_BIN_PATH')
+NPM_BIN_PATH = os.environ['NPM_BIN_PATH']
+
 # Required for django-tailwind
 INTERNAL_IPS = [
     "127.0.0.1",
