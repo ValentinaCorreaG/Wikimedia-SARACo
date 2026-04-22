@@ -221,14 +221,11 @@ MEDIAWIKI_OAUTH_SECRET=<production-secret>
 - Check Django debug page in development
 - Review test suite for usage examples
 
-## 🎯 Next Steps
+## 🎯 Deployment
 
-After setup, you can:
-1. Customize user profile fields in `users/models.py`
-2. Add more views and features
-3. Customize the Tailwind theme in `theme/static_src/tailwind.config.js`
-4. Add more HTMX interactions
-5. Extend the authentication pipeline
+You can access the tool at https://sara-colombia.toolforge.org/
+
+The application was deployed on Toolforge, following the official deployment documentation (https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Django_OAuth_tool#Configure_project_for_production_environment__) and best practices for hosting Wikimedia-related tools.
 
 ---
 
