@@ -202,7 +202,13 @@ MEDIAWIKI_OAUTH_SECRET=<production-secret>
 
 The application was deployed on Toolforge, following the official deployment  [documentation](https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Django_OAuth_tool#Configure_project_for_production_environment) and best practices for hosting Wikimedia-related tools.
 
-🌐 Live Tool
+###📝 Note
+
+The database is currently running on SQLite3 for simplicity and ease of setup.
+
+If the application needs to scale in the future, it can be migrated to MariaDB, as recommended in the official Toolforge documentation.
+
+###🌐 Live Tool
 Visit [sara-colombia](https://sara-colombia.toolforge.org/)
 
 ---
