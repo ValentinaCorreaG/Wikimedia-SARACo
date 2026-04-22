@@ -200,10 +200,10 @@ MEDIAWIKI_OAUTH_SECRET=<production-secret>
 
 ## 🎯 Toolforge Deployment
 
-The application was deployed on Toolforge, following the official deployment documentation (https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Django_OAuth_tool#Configure_project_for_production_environment__) and best practices for hosting Wikimedia-related tools.
+The application was deployed on Toolforge, following the official deployment  [documentation](https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Django_OAuth_tool#Configure_project_for_production_environment) and best practices for hosting Wikimedia-related tools.
 
 🌐 Live Tool
-Visit `https://sara-colombia.toolforge.org/`
+Visit [sara-colombia](https://sara-colombia.toolforge.org/)
 
 ---
 
