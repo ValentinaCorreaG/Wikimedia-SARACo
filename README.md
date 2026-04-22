@@ -1,31 +1,30 @@
 # Wikimedia Colombia SARA
 
-A modern Django web application with Wikimedia OAuth authentication, built with HTMX and Tailwind CSS.
+A Django web application for Wikimedia Colombia with Wikimedia OAuth authentication, HTMX interactions, and a Tailwind CSS UI, deployed on Toolforge.
 
 ## ✨ Features
 
-- 🔐 **Wikimedia OAuth Authentication** - Secure login with Wikimedia accounts
-- 🎨 **Modern UI** - Beautiful interface with Tailwind CSS and DaisyUI
-- ⚡ **HTMX Integration** - Dynamic interactions without heavy JavaScript
-- 🛡️ **Security First** - Session security, logging, and best practices
-- 📱 **Responsive Design** - Mobile-first approach
-- 🧪 **Comprehensive Tests** - Full test coverage for authentication
-- 📊 **User Management** - Profiles, teams, and positions
+- 🔐 Wikimedia OAuth Authentication via social-auth-app-django
+- 🎨 Modern UI with Tailwind CSS + DaisyUI
+- ⚡ HTMX Integration for dynamic server-rendered interactions
+- 🛡️ Production Security Settings (secure cookies, HTTPS-aware setup, CSRF hardening)
+- 🧾 Application and Auth Logging with rotating files
+- 📱 Responsive Interface
+- 👤 User and Profile Management
 
 ## 🚀 Tech Stack
 
-- **Backend**: Django 4.2+
+- **Backend**: Django 5.2.x+
 - **Frontend**: HTMX + Tailwind CSS + DaisyUI
 - **Authentication**: Python Social Auth (Wikimedia OAuth)
 - **Database**: SQLite (development) / PostgreSQL (production ready)
-- **Testing**: Django Test Framework
+- **Static files**: WhiteNoise + collectstatic
 
 ## 📋 Prerequisites
 
-- Python 3.10+
-- Node.js 18+ (for Tailwind CSS compilation)
-- npm or yarn
-- A Wikimedia account (for OAuth setup)
+- Python 3.10+ (Toolforge runtime example uses python3.13)
+- Node.js + npm (for Tailwind CSS compilation)
+- Wikimedia account (for OAuth consumer registration)
 
 ## 🔧 Quick Start
 
@@ -42,24 +41,30 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 python manage.py tailwind install
+python manage.py migrate
 ```
 
-### 2. Configure OAuth
+### 2. Configure environment variables
 
-1. Register your app at [Wikimedia OAuth](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration)
-2. Copy `.env.example` to `.env`
-3. Add your OAuth credentials to `.env`
-
-See [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for detailed instructions.
-
-### 3. Database Setup
+This project loads .env from project root on startup (without overriding existing OS env vars).
+Create .env with values that match the current settings.py keys:
 
 ```bash
-python manage.py migrate
-python manage.py createsuperuser  # Optional
+DJANGO_SECRET_KEY=<your-secret-key>
+DJANGO_DEBUG=true
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+MEDIAWIKI_OAUTH_KEY=<consumer-key>
+SOCIAL_AUTH_MEDIAWIKI_SECRET=<consumer-secret>
+MEDIAWIKI_URL=https://meta.wikimedia.org/w/index.php
+SOCIAL_AUTH_MEDIAWIKI_CALLBACK=http://127.0.0.1:8000/oauth/complete/mediawiki/
+NPM_BIN_PATH=<path-to-npm>
 ```
+Examples for NPM_BIN_PATH:
 
-### 4. Run Development Servers
+* Linux/macOS: NPM_BIN_PATH=$(command -v npm)
+* Windows PowerShell: NPM_BIN_PATH=(Get-Command npm).Source
+
+### 3. Run Development Servers
 
 **Terminal 1 - Tailwind CSS:**
 ```bash
@@ -73,41 +78,37 @@ python manage.py runserver
 
 Visit `http://127.0.0.1:8000/`
 
+# 4. 🎨 Tailwind and static assets
+
+In development, use tailwind start watcher.
+
+For production:
+
+```bash
+python manage.py tailwind build
+python manage.py collectstatic --noinput
+```
+If CSS requests return HTML (MIME error), static files were not built/collected correctly or the file does not exist in collected static output.
+
 ## 📁 Project Structure
 
 ```
-wikimedia-colombia-sara/
-├── core/                      # Main application
-├── users/                     # Authentication & user management
-│   ├── models.py             # User, UserProfile, TeamArea, Position
-│   ├── views.py              # Authentication views
-│   ├── pipeline.py           # Custom OAuth pipeline
-│   ├── tests.py              # Comprehensive test suite
-│   ├── templates/            # User templates
-│   │   └── users/
-│   │       ├── login.html
-│   │       ├── profile.html
-│   │       └── partials/     # HTMX partials
-│   └── urls.py
-├── theme/                     # Tailwind CSS app
+Wikimedia-SARACo/
+├── app.py
+├── core/
+├── users/
+├── theme/
 │   ├── static/
-│   │   └── css/dist/         # Compiled CSS
-│   ├── static_src/           # Source files
-│   │   ├── src/styles.css
-│   │   └── tailwind.config.js
-│   └── templates/
-│       ├── base.html
-│       └── partials/
-│           └── sidebar.html
-├── wikimediacolombiasara/    # Django settings
-│   ├── settings.py           # With security & logging
-│   └── urls.py
-├── logs/                      # Application logs
-├── .env.example              # Environment template
+│   └── static_src/
+├── wikimediacolombiasara/
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── manage.py
 ├── requirements.txt
-├── AUTHENTICATION_SETUP.md   # Detailed auth guide
 └── README.md
 ```
+app.py exposes app = get_wsgi_application() for Toolforge runtime compatibility.
 
 ## 🔐 Authentication Features
 
@@ -145,20 +146,6 @@ wikimedia-colombia-sara/
    - Creates user profile automatically
    - Logs authentication event
 5. User redirected to home page
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-python manage.py test
-
-# Run authentication tests only
-python manage.py test users
-
-# Run with coverage
-coverage run --source='.' manage.py test
-coverage report
-```
 
 ## 🎨 UI Components
 
@@ -210,22 +197,13 @@ MEDIAWIKI_OAUTH_SECRET=<production-secret>
 4. Run tests: `python manage.py test`
 5. Submit a pull request
 
-## 📝 License
 
-[Add your license here]
-
-## 🆘 Support
-
-- Check `logs/` directory for application logs
-- Review [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md) for OAuth issues
-- Check Django debug page in development
-- Review test suite for usage examples
-
-## 🎯 Deployment
-
-You can access the tool at https://sara-colombia.toolforge.org/
+## 🎯 Toolforge Deployment
 
 The application was deployed on Toolforge, following the official deployment documentation (https://wikitech.wikimedia.org/wiki/Help:Toolforge/My_first_Django_OAuth_tool#Configure_project_for_production_environment__) and best practices for hosting Wikimedia-related tools.
+
+🌐 Live Tool
+Visit `https://sara-colombia.toolforge.org/`
 
 ---
 
